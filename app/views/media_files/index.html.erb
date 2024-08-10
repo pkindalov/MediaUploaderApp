@@ -1,9 +1,21 @@
+<!--<h1>Files in <%#= @folder.name %></h1>-->
+<%#= link_to 'Upload New File', new_folder_media_file_path(@folder), class: 'btn btn-primary' %>
+<!--<ul>-->
+  <%# @media_files.each do |media_file| %>
+<!--    <li>-->
+      <%#= link_to media_file.file, "#{@folder.user.email}/#{@folder.name}/#{media_file.file}", class: 'nav-link' %>
+<!--    </li>-->
+  <%# end %>
+<!--</ul>-->
+
 <h1>Files in <%= @folder.name %></h1>
 <%= link_to 'Upload New File', new_folder_media_file_path(@folder), class: 'btn btn-primary' %>
-<ul>
+<ul style="list-style-type: none; padding: 0;">
   <% @media_files.each do |media_file| %>
-    <li>
-      <%= link_to media_file.file.filename, rails_blob_path(media_file.file, disposition: "attachment") %>
+    <li style="display: inline-block; margin: 10px;">
+      <%= link_to "/#{@folder.user.email}/#{@folder.name}/#{media_file.file}", target: '_blank' do %>
+        <img src="/#{@folder.user.email}/#{@folder.name}/#{media_file.file}" alt="<%= media_file.file %>" style="width: 100px; height: auto;" />
+      <% end %>
     </li>
   <% end %>
 </ul>
