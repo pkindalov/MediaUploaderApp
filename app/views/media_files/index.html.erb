@@ -1,0 +1,9 @@
+<h1>Files in <%= @folder.name %></h1>
+<%= link_to 'Upload New File', new_folder_media_file_path(@folder), class: 'btn btn-primary' %>
+<ul>
+  <% @media_files.each do |media_file| %>
+    <li>
+      <%= link_to media_file.file.filename, rails_blob_path(media_file.file, disposition: "attachment") %>
+    </li>
+  <% end %>
+</ul>

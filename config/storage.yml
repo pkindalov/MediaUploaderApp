@@ -1,3 +1,7 @@
+external:
+  service: Disk
+  root: E:\MediaUploader
+
 test:
   service: Disk
   root: <%= Rails.root.join("tmp/storage") %>

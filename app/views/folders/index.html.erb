@@ -1,0 +1,10 @@
+<h1>Your Folders</h1>
+<%= link_to 'New Folder', new_folder_path, class: 'btn btn-primary' %>
+
+<ul>
+  <% @folders.each do |folder| %>
+    <li>
+      <%= link_to folder.name, folder_media_files_path(folder), class: 'nav-link' %>
+    </li>
+  <% end %>
+</ul>

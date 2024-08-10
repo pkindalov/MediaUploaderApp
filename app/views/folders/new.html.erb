@@ -1,0 +1,8 @@
+<h1>New Folder</h1>
+<%= form_with model: @folder, local: true do |form| %>
+  <div class="mb-3">
+    <%= form.label :name, class: 'form-label' %>
+    <%= form.text_field :name, class: 'form-control' %>
+  </div>
+  <%= form.submit 'Create Folder', class: 'btn btn-primary' %>
+<% end %>
