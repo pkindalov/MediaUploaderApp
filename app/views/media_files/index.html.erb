@@ -3,10 +3,31 @@
 <ul style="list-style-type: none; padding: 0;">
   <% @media_files.each do |media_file| %>
     <li style="display: inline-block; margin: 10px; text-align: center;">
-      <a target="_blank" href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>">
-        <%= image_tag(serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}"), alt: media_file.file, style: "max-width: 150px; max-height: 150px; display: block;") %>
+      <% file_extension = File.extname(media_file.file).downcase %>
+
+      <% if ['.jpg', '.jpeg', '.png', '.gif'].include?(file_extension) %>
+        <!-- Показване на изображение -->
+        <a href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>">
+          <%= image_tag(serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}"), alt: media_file.file, style: "max-width: 150px; max-height: 150px; display: block;") %>
+          <%= media_file.file %>
+        </a>
+      <% elsif ['.mp4', '.webm', '.ogg'].include?(file_extension) %>
+        <!-- Показване на видео -->
+        <video width="150" controls>
+          <source src="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>" type="video/<%= file_extension[1..-1] %>">
+          Your browser does not support the video tag.
+        </video>
+        <br>
         <%= media_file.file %>
-      </a>
+      <% else %>
+        <!-- Показване на икона с Font Awesome за неизвестен тип файл -->
+        <a href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>">
+          <i class="fas fa-file" style="font-size: 50px; display: block;"></i>
+          <%= media_file.file %>
+        </a>
+      <% end %>
+
     </li>
   <% end %>
+
 </ul>
