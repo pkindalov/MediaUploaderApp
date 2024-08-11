@@ -1,33 +1,37 @@
-<h1>Files in <%= @folder.name %></h1>
-<%= link_to 'Upload New File', new_folder_media_file_path(@folder), class: 'btn btn-primary' %>
-<ul style="list-style-type: none; padding: 0;">
+<h1 class="mb-4">Files in <%= @folder.name %></h1>
+<%= link_to 'Upload New File', new_folder_media_file_path(@folder), class: 'btn btn-primary mb-3' %>
+<div class="row">
   <% @media_files.each do |media_file| %>
-    <li style="display: inline-block; margin: 10px; text-align: center;">
-      <% file_extension = File.extname(media_file.file).downcase %>
-
-      <% if ['.jpg', '.jpeg', '.png', '.gif'].include?(file_extension) %>
-        <!-- Показване на изображение -->
-        <a href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>">
-          <%= image_tag(serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}"), alt: media_file.file, style: "max-width: 150px; max-height: 150px; display: block;") %>
-          <%= media_file.file %>
-        </a>
-      <% elsif ['.mp4', '.webm', '.ogg'].include?(file_extension) %>
-        <!-- Показване на видео -->
-        <video width="150" controls>
-          <source src="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>" type="video/<%= file_extension[1..-1] %>">
-          Your browser does not support the video tag.
-        </video>
-        <br>
-        <%= media_file.file %>
-      <% else %>
-        <!-- Показване на икона с Font Awesome за неизвестен тип файл -->
-        <a href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>">
-          <i class="fas fa-file" style="font-size: 50px; display: block;"></i>
-          <%= media_file.file %>
-        </a>
-      <% end %>
-
-    </li>
+    <% file_extension = File.extname(media_file.file).downcase %>
+    <div class="col-md-3 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <% if ['.jpg', '.jpeg', '.png', '.gif'].include?(file_extension) %>
+            <!-- Показване на изображение -->
+            <a href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>">
+              <%= image_tag(serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}"), alt: media_file.file, class: 'img-fluid mb-2') %>
+            </a>
+          <% elsif ['.mp4', '.webm', '.ogg', '.mov'].include?(file_extension) %>
+            <!-- Показване на видео -->
+            <video class="img-fluid mb-2" controls>
+              <source src="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>" type="video/<%= file_extension[1..-1] == 'mov' ? 'quicktime' : file_extension[1..-1] %>">
+              Your browser does not support the video tag.
+            </video>
+            <!-- Бутон за изтегляне -->
+            <a href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>" download class="btn btn-secondary mt-2">
+              <i class="fas fa-download"></i> Download
+            </a>
+          <% else %>
+            <!-- Показване на икона с Font Awesome за неизвестен тип файл -->
+            <a href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>">
+              <i class="fas fa-file fa-4x mb-2"></i>
+            </a>
+          <% end %>
+        </div>
+        <div class="card-footer text-center">
+          <small class="text-muted"><%= media_file.file %></small>
+        </div>
+      </div>
+    </div>
   <% end %>
-
-</ul>
+</div>
