@@ -2,8 +2,16 @@
 
 <% if user_signed_in? %>
   <p>Hello, <%= current_user.email %>!</p>
-  <%= link_to 'Logout', destroy_user_session_path, method: :delete %>
+  <%= link_to destroy_user_session_path, method: :delete, data: { turbo_method: :delete }, class: 'nav-link' do %>
+    <i class="fa-solid fa-right-from-bracket"></i> Изход
+  <% end %>
 <% else %>
-  <%= link_to 'Sign up', new_user_registration_path %> |
-  <%= link_to 'Login', new_user_session_path %>
+  <div class="d-flex  align-items-center mt-4">
+    <%= link_to new_user_registration_path, class: 'nav-link d-flex align-items-center mx-2' do %>
+      <i class="fa-solid fa-user-plus me-1"></i> Регистрирай се
+    <% end %>
+    <%= link_to new_user_session_path, class: 'nav-link d-flex align-items-center mx-2' do %>
+      <i class="fa-solid fa-door-open me-1"></i> Вход
+    <% end %>
+  </div>
 <% end %>

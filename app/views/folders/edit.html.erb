@@ -1,0 +1,13 @@
+<h1 class="mb-5"><i class="fa-solid fa-pen-to-square"></i> Редактиране на <i class="fa-solid fa-folder"></i>
+  папка <%= @folder.name %></h1>
+
+<%= form_with model: @folder, local: true do |form| %>
+  <div class="form-group mb-3">
+    <%= form.label :name %>
+    <%= form.text_field :name, class: 'form-control' %>
+  </div>
+
+  <%= form.submit 'Запази', class: 'btn btn-primary' %>
+<% end %>
+
+<%= link_to 'Back', folders_path, class: 'btn btn-secondary mt-2' %>

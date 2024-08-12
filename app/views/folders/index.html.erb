@@ -1,18 +1,29 @@
 <h1>Your Folders</h1>
-<%= link_to 'New Folder', new_folder_path, class: 'btn btn-primary' %>
+<%= link_to new_folder_path, class: 'btn btn-primary mt-3 mb-5' do %>
+  <i class="fa-solid fa-folder-plus"></i> Нова Папка
+<% end %>
 
 <% if @folders.count > 0 %>
-  <ul>
+  <ul class="list-group">
     <% @folders.each do |folder| %>
-      <li>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
         <%= link_to folder.name, folder_media_files_path(folder), class: 'nav-link' %>
+
+        <div class="btn-group" role="group">
+          <%= link_to edit_folder_path(folder), class: 'btn btn-secondary btn-sm' do %>
+            <i class="fa-solid fa-pen-to-square"></i> Редактирай
+          <% end %>
+          <%= link_to folder_path(folder), method: :delete, data: { confirm: 'Сигурни ли сте (това ще изтрие и съдържанието на папката)?' }, class: 'btn btn-danger btn-sm' do %>
+            <i class="fa-solid fa-trash"></i> Изтрий
+          <% end %>
+        </div>
       </li>
     <% end %>
   </ul>
 
   <div class="text-center">
-    <%= will_paginate @media_files, renderer: BootstrapPagination::Rails %>
+    <%= will_paginate @folders, renderer: BootstrapPagination::Rails %>
   </div>
 <% else %>
-    <p>Все още няма създадени директории</p>
+  <p>Все още няма създадени директории</p>
 <% end %>
