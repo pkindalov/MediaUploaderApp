@@ -1,37 +1,46 @@
 <h1 class="mb-4">Files in <%= @folder.name %></h1>
 <%= link_to 'Upload New File', new_folder_media_file_path(@folder), class: 'btn btn-primary mb-3' %>
 <div class="row">
-  <% @media_files.each do |media_file| %>
-    <% file_extension = File.extname(media_file.file).downcase %>
-    <div class="col-md-3 mb-4">
-      <div class="card h-100">
-        <div class="card-body text-center">
-          <% if ['.jpg', '.jpeg', '.png', '.gif'].include?(file_extension) %>
-            <!-- Показване на изображение -->
-            <a href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>">
-              <%= image_tag(serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}"), alt: media_file.file, class: 'img-fluid mb-2') %>
-            </a>
-          <% elsif ['.mp4', '.webm', '.ogg', '.mov'].include?(file_extension) %>
-            <!-- Показване на видео -->
-            <video class="img-fluid mb-2" controls>
-              <source src="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>" type="video/<%= file_extension[1..-1] == 'mov' ? 'quicktime' : file_extension[1..-1] %>">
-              Your browser does not support the video tag.
-            </video>
-            <!-- Бутон за изтегляне -->
-            <a href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>" download class="btn btn-secondary mt-2">
-              <i class="fas fa-download"></i> Download
-            </a>
-          <% else %>
-            <!-- Показване на икона с Font Awesome за неизвестен тип файл -->
-            <a href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>">
-              <i class="fas fa-file fa-4x mb-2"></i>
-            </a>
-          <% end %>
-        </div>
-        <div class="card-footer text-center">
-          <small class="text-muted"><%= media_file.file %></small>
+  <% if @media_files.count > 0 %>
+    <% @media_files.each do |media_file| %>
+      <% file_extension = File.extname(media_file.file).downcase %>
+      <div class="col-md-3 mb-4">
+        <div class="card h-100">
+          <div class="card-body text-center">
+            <% if ['.jpg', '.jpeg', '.png', '.gif'].include?(file_extension) %>
+              <!-- Показване на изображение -->
+              <a href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>">
+                <%= image_tag(serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}"), alt: media_file.file, class: 'img-fluid mb-2') %>
+              </a>
+            <% elsif ['.mp4', '.webm', '.ogg', '.mov'].include?(file_extension) %>
+              <!-- Показване на видео -->
+              <video class="img-fluid mb-2" controls>
+                <source src="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>" type="video/<%= file_extension[1..-1] == 'mov' ? 'quicktime' : file_extension[1..-1] %>">
+                Your browser does not support the video tag.
+              </video>
+              <!-- Бутон за изтегляне -->
+              <a href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>" download class="btn btn-secondary mt-2">
+                <i class="fas fa-download"></i> Download
+              </a>
+            <% else %>
+              <!-- Показване на икона с Font Awesome за неизвестен тип файл -->
+              <a href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>">
+                <i class="fas fa-file fa-4x mb-2"></i>
+              </a>
+            <% end %>
+          </div>
+          <div class="card-footer text-center">
+            <small class="text-muted"><%= media_file.file %></small>
+          </div>
         </div>
       </div>
+    <% end %>
+
+    <div class="text-center">
+      <%= will_paginate @media_files, renderer: BootstrapPagination::Rails %>
     </div>
+  <% else %>
+    <p>Все още няма файлове в тази директория</p>
   <% end %>
+
 </div>

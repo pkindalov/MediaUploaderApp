@@ -5,7 +5,7 @@ class MediaFilesController < ApplicationController
   before_action :set_paths
 
   def index
-    @media_files = @folder.media_files
+    @media_files = @folder.media_files.paginate(page: params[:page], per_page: 40).order('created_at DESC')
   end
 
   def new
