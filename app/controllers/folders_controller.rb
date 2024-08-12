@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class FoldersController < ApplicationController
   before_action :authenticate_user!
 
   def index
     create_physical_folder_for_user # Създава физическа директория за потребителя, ако не съществува
-    @folders = current_user.folders
+    @folders = current_user.folders.paginate(page: params[:page], per_page: 40).order('created_at DESC')
   end
 
   def new

@@ -1,10 +1,18 @@
 <h1>Your Folders</h1>
 <%= link_to 'New Folder', new_folder_path, class: 'btn btn-primary' %>
 
-<ul>
-  <% @folders.each do |folder| %>
-    <li>
-      <%= link_to folder.name, folder_media_files_path(folder), class: 'nav-link' %>
-    </li>
-  <% end %>
-</ul>
+<% if @folders.count > 0 %>
+  <ul>
+    <% @folders.each do |folder| %>
+      <li>
+        <%= link_to folder.name, folder_media_files_path(folder), class: 'nav-link' %>
+      </li>
+    <% end %>
+  </ul>
+
+  <div class="text-center">
+    <%= will_paginate @media_files, renderer: BootstrapPagination::Rails %>
+  </div>
+<% else %>
+    <p>Все още няма създадени директории</p>
+<% end %>
