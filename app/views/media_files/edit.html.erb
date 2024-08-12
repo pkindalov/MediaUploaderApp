@@ -1,0 +1,12 @@
+<h1>Премименувай файл <%= @media_file.file %></h1>
+
+<%= form_with model: [@folder, @media_file], local: true do |form| %>
+  <div class="form-group mt-3">
+    <%= form.label :file, 'Ново име на файла',class: "mt-3 mb-1" %>
+    <%= form.text_field :file, class: 'form-control mt-3 mb-3', value: @media_file.file %>
+  </div>
+
+  <%= form.submit 'Rename', class: 'btn btn-primary' %>
+<% end %>
+
+<%= link_to 'Back', folder_media_files_path(@folder), class: 'btn btn-secondary mt-2' %>
