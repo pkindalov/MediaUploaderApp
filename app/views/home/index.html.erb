@@ -1,17 +1,44 @@
-<h1>Welcome to MediaUploaderApp</h1>
+<% if current_user %>
+  <h1 class="mb-5">Добре дошли в MediaUploaderApp</h1>
 
-<% if user_signed_in? %>
-  <p>Hello, <%= current_user.email %>!</p>
-  <%= link_to destroy_user_session_path, method: :delete, data: { turbo_method: :delete }, class: 'nav-link' do %>
-    <i class="fa-solid fa-right-from-bracket"></i> Изход
-  <% end %>
-<% else %>
-  <div class="d-flex  align-items-center mt-4">
-    <%= link_to new_user_registration_path, class: 'nav-link d-flex align-items-center mx-2' do %>
-      <i class="fa-solid fa-user-plus me-1"></i> Регистрирай се
-    <% end %>
-    <%= link_to new_user_session_path, class: 'nav-link d-flex align-items-center mx-2' do %>
-      <i class="fa-solid fa-door-open me-1"></i> Вход
-    <% end %>
+  <div class="mb-4">
+    <h3>Последни качени папки</h3>
+    <ul class="list-group">
+      <% if @recent_folders.any? %>
+        <% @recent_folders.each do |folder| %>
+          <li class="list-group-item">
+            <%= link_to folder.name, folder_media_files_path(folder), class: 'text-decoration-none' %>
+            <small class="text-muted">
+              - качена на <%= folder.created_at.strftime("%d/%m/%Y") %> от <%= folder.user.email %>
+            </small>
+          </li>
+        <% end %>
+      <% else %>
+        <li class="list-group-item">Няма качени папки.</li>
+      <% end %>
+    </ul>
   </div>
+
+  <div>
+    <h3>Последни качени файлове</h3>
+    <ul class="list-group">
+      <% if @recent_files.any? %>
+        <% @recent_files.each do |media_file| %>
+          <li class="list-group-item">
+            <%# Генериране на правилния път към файла с включено име на папката и потребителя %>
+            <a href="<%= serve_media_file_path(file_path: "#{Rails.configuration.user_files_path}/#{media_file.folder.user.email}/#{media_file.folder.name}/#{media_file.file}") %>" target="_blank" class="text-decoration-none">
+              <%= media_file.file %>
+            </a>
+            <small class="text-muted">
+              - качен на <%= media_file.created_at.strftime("%d/%m/%Y") %> от <%= media_file.folder.user.email %>
+            </small>
+          </li>
+        <% end %>
+      <% else %>
+        <li class="list-group-item">Няма качени файлове.</li>
+      <% end %>
+    </ul>
+  </div>
+<% else %>
+
 <% end %>
