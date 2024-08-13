@@ -1,7 +1,7 @@
 class MediaFilesController < ApplicationController
   before_action :set_folder
   before_action :set_paths
-  before_action :set_media_file, only: %i[edit update destroy]
+  before_action :set_media_file, only: %i[edit update destroy watch]
 
   def index
     @media_files = @folder.media_files.paginate(page: params[:page], per_page: 40).order('created_at DESC')
@@ -37,13 +37,13 @@ class MediaFilesController < ApplicationController
 
     if rename_physical_file(old_file_name, new_file_name)
       if @media_file.update(file: new_file_name)
-        redirect_to folder_media_files_path(@folder), notice: 'File renamed successfully.'
+        redirect_to folder_media_files_path(@folder), notice: 'Файлът е преименуван успешно.'
       else
         Rails.logger.debug "MediaFile errors: #{@media_file.errors.full_messages}"
         render :edit
       end
     else
-      redirect_to folder_media_files_path(@folder), alert: 'Failed to rename file.'
+      redirect_to folder_media_files_path(@folder), alert: 'Неуспешно преименуване на файлът. Може би сървърът използва файла. Ако имате отворен таб, в който гледате видеото вероятно трябва първо да го затворите. Или ако теглите файлът и все още не е изтеглен.'
     end
   end
 
@@ -57,6 +57,10 @@ class MediaFilesController < ApplicationController
       @media_file.destroy
       redirect_to folder_media_files_path(@folder), notice: 'File deleted successfully.'
     end
+  end
+
+  def watch
+    # Изгледът ще се използва за визуализиране на видеото в нов таб
   end
 
   private

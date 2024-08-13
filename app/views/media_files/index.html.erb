@@ -15,14 +15,17 @@
                 <%= image_tag(serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}"), alt: media_file.file, class: 'img-fluid mb-2') %>
               </a>
             <% elsif ['.mp4', '.webm', '.ogg', '.mov'].include?(file_extension) %>
-              <!-- Показване на видео -->
-              <video class="img-fluid mb-2" controls>
-                <source src="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>" type="video/<%= file_extension[1..-1] == 'mov' ? 'quicktime' : file_extension[1..-1] %>">
-                Your browser does not support the video tag.
-              </video>
+              <!-- Показване на икона за видео -->
+              <div class="d-flex flex-column align-items-center mb-2">
+                <i class="fas fa-video fa-4x"></i>
+                <!-- Бутон за гледане на видео -->
+                <a href="<%= watch_folder_media_file_path(@folder, media_file) %>" target="_blank" class="btn btn-primary mt-2">
+                  <i class="fas fa-play"></i> Гледай
+                </a>
+              </div>
               <!-- Бутон за изтегляне -->
               <a href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>" download class="btn btn-secondary mt-2">
-                <i class="fas fa-download"></i> Download
+                <i class="fas fa-download"></i> Свали
               </a>
             <% else %>
               <!-- Показване на икона с Font Awesome за неизвестен тип файл -->
