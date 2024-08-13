@@ -35,7 +35,11 @@ Rails.application.configure do
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :external
-  config.user_files_path = Rails.root.join("E:/MediaUploader")
+  # config.user_files_path = Rails.root.join("E:/MediaUploader")
+
+  main_dir_name = ENV.fetch('MAIN_DIR_NAME', 'MediaUploader')
+  disk_mount_point = ENV.fetch('DISK_MOUNT_POINT', 'E:/')
+  config.user_files_path = File.join(disk_mount_point, main_dir_name)
 
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false

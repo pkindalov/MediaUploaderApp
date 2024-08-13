@@ -57,6 +57,8 @@
     <orderEntry type="library" scope="PROVIDED" name="date (v3.3.4, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="debug (v1.9.2, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="devise (v4.9.4, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="dotenv (v3.1.2, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="dotenv-rails (v3.1.2, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="drb (v2.2.1, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="erubi (v1.13.0, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="execjs (v2.9.1, ruby-3.3.3-p89) [gem]" level="application" />

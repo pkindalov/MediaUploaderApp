@@ -4,7 +4,8 @@ class HomeController < ApplicationController
     if current_user
       @recent_folders = Folder.order(created_at: :desc).limit(5)
       @recent_files = MediaFile.order(created_at: :desc).limit(5)
-      @disk_usage = calculate_disk_usage('E:/') # Specify the correct mount point
+      disk_mount_point = ENV.fetch('DISK_MOUNT_POINT', 'E:/')
+      @disk_usage = calculate_disk_usage(disk_mount_point) # Specify the correct mount point
     end
   end
 
