@@ -18,6 +18,20 @@
               <a href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>">
                 <%= image_tag(serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}"), alt: media_file.file, class: 'img-fluid mb-2') %>
               </a>
+              <!-- EXIF Information -->
+              <% exif_info = @exif_data[media_file.id] %>
+              <% if exif_info && exif_info[:date_time_original] %>
+                <div class="exif-info text-start">
+                  <p>Дата на заснемане: <%= exif_info[:date_time_original] %></p>
+                  <p>Бленда: <%= exif_info[:f_number] %></p>
+                  <p>ISO: <%= exif_info[:iso_speed_ratings] %></p>
+                  <p>Време на експозиция: <%= exif_info[:exposure_time] %></p>
+                </div>
+              <% else %>
+                <div class="exif-info text-start">
+                  <p>Няма налична EXIF информация</p>
+                </div>
+              <% end %>
             <% elsif ['.mp4', '.webm', '.ogg', '.mov'].include?(file_extension) %>
               <!-- Показване на икона за видео -->
               <div class="d-flex flex-column align-items-center mb-2">

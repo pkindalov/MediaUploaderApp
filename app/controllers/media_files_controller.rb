@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+require 'exifr/jpeg'  # Add this line to require the EXIFR library
+
 class MediaFilesController < ApplicationController
   before_action :set_folder
   before_action :set_paths
@@ -6,6 +10,7 @@ class MediaFilesController < ApplicationController
 
   def index
     @media_files = @folder.media_files.paginate(page: params[:page], per_page: 40).order('created_at DESC')
+    @exif_data = extract_exif_data
   end
 
   def new
@@ -147,5 +152,28 @@ class MediaFilesController < ApplicationController
       Rails.logger.warn "File not found, treating as successful deletion."
       true
     end
+  end
+
+  def extract_exif_data
+    exif_data = {}
+    @folder.media_files.each do |media_file|
+      file_path = File.join(@user_folder_path, media_file.file)
+      next unless ['.jpg', '.jpeg'].include?(File.extname(file_path).downcase)
+
+      begin
+        exif = EXIFR::JPEG.new(file_path)
+        if exif
+          exif_data[media_file.id] = {
+            date_time_original: exif.date_time_original,
+            f_number: exif.f_number,
+            exposure_time: exif.exposure_time.to_s, # Convert Rational to String for display
+            iso_speed_ratings: exif.iso_speed_ratings
+          }
+        end
+      rescue => e
+        Rails.logger.error "Error extracting EXIF data: #{e.message}"
+      end
+    end
+    exif_data
   end
 end
