@@ -1,14 +1,21 @@
 <% if current_user %>
   <h1 class="mb-5">Добре дошли в MediaUploaderApp</h1>
 
-  <div class="disk-usage mb-4">
-    <h3>Disk Usage</h3>
-    <ul class="list-group">
-      <li class="list-group-item">Total Space: <%= @disk_usage[:total] %></li>
-      <li class="list-group-item">Used Space: <%= @disk_usage[:used] %> (<%= @disk_usage[:percent_used] %>%)</li>
-      <li class="list-group-item">Free Space: <%= @disk_usage[:free] %> (<%= @disk_usage[:percent_free] %>%)</li>
-    </ul>
-  </div>
+  <% if @disk_usage %>
+    <div class="disk-usage mb-4">
+      <h3>Disk Usage</h3>
+      <ul class="list-group">
+        <li class="list-group-item">Total Space: <%= @disk_usage[:total] %></li>
+        <li class="list-group-item">Used Space: <%= @disk_usage[:used] %> (<%= @disk_usage[:percent_used] %>%)</li>
+        <li class="list-group-item">Free Space: <%= @disk_usage[:free] %> (<%= @disk_usage[:percent_free] %>%)</li>
+      </ul>
+    </div>
+  <% else %>
+    <div class="alert alert-warning">
+      Външното устройство не е свързано. Моля, свържете го, за да видите информация за дисковото пространство.
+      Също така няма да може да виждате файловете, които се качили
+    </div>
+  <% end %>
 
   <div class="mb-4">
     <h3>Последни качени папки</h3>
