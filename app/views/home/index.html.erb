@@ -1,5 +1,7 @@
-<% if current_user %>
-  <h1 class="mb-5">Добре дошли в MediaUploaderApp</h1>
+<h1 class="mb-5">Добре дошли в MediaUploaderApp</h1>
+
+<% if user_signed_in? %>
+  <p>Здравейте, <%= current_user.email %>!</p>
 
   <div class="mb-4">
     <h3>Последни качени папки</h3>
@@ -40,5 +42,5 @@
     </ul>
   </div>
 <% else %>
-
+  <p>Добре дошли! За да видите каченото съдържание, моля <%= link_to 'влезте', new_user_session_path %> или <%= link_to 'регистрирайте се', new_user_registration_path %>.</p>
 <% end %>

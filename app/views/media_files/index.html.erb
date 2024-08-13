@@ -1,7 +1,11 @@
 <h1 class="mb-5">Съдържание на папка <%= @folder.name %></h1>
-<%= link_to new_folder_media_file_path(@folder), class: 'btn btn-primary mb-3' do %>
-  <i class="fa-regular fa-file"></i> Качете файл
+
+<% if @folder.user == current_user %>
+  <%= link_to new_folder_media_file_path(@folder), class: 'btn btn-primary mb-3' do %>
+    <i class="fa-regular fa-file"></i> Качете файл
+  <% end %>
 <% end %>
+
 <div class="row">
   <% if @media_files.count > 0 %>
     <% @media_files.each do |media_file| %>
@@ -36,14 +40,16 @@
           </div>
           <div class="card-footer text-center">
             <small class="text-muted"><%= media_file.file %></small>
-            <div class="mt-2">
-              <%= link_to edit_folder_media_file_path(@folder, media_file), class: 'btn btn-warning btn-sm' do %>
-                <i class="fas fa-edit"></i> Преименувай
-              <% end %>
-              <%= link_to folder_media_file_path(@folder, media_file), method: :delete, data: { confirm: 'Сигурни ли сте?' }, class: 'btn btn-danger btn-sm' do %>
-                <i class="fas fa-trash-alt"></i> Изтрий
-              <% end %>
-            </div>
+            <% if media_file.folder.user == current_user %>
+              <div class="mt-2">
+                <%= link_to edit_folder_media_file_path(@folder, media_file), class: 'btn btn-warning btn-sm' do %>
+                  <i class="fas fa-edit"></i> Преименувай
+                <% end %>
+                <%= link_to folder_media_file_path(@folder, media_file), method: :delete, data: { confirm: 'Сигурни ли сте?' }, class: 'btn btn-danger btn-sm' do %>
+                  <i class="fas fa-trash-alt"></i> Изтрий
+                <% end %>
+              </div>
+            <% end %>
           </div>
         </div>
       </div>

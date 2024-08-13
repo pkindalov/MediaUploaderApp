@@ -9,23 +9,31 @@ class MediaFilesController < ApplicationController
   end
 
   def new
-    @media_file = current_user.folders.find(params[:folder_id]).media_files.new
+    if @folder.user == current_user
+      @media_file = @folder.media_files.new
+    else
+      redirect_to folder_media_files_path(@folder), alert: 'Нямате права да качвате файлове в тази папка.'
+    end
   end
 
   def create
-    if params[:media_file].present? && params[:media_file][:file].present?
-      uploaded_file = params[:media_file][:file]
-      file_name_with_extension = save_file_to_physical_folder(uploaded_file)
-      @media_file = current_user.folders.find(params[:folder_id]).media_files.new(file: file_name_with_extension)
+    if @folder.user == current_user
+      if params[:media_file].present? && params[:media_file][:file].present?
+        uploaded_file = params[:media_file][:file]
+        file_name_with_extension = save_file_to_physical_folder(uploaded_file)
+        @media_file = @folder.media_files.new(file: file_name_with_extension)
 
-      if @media_file.save
-        redirect_to folder_media_files_path(@folder), notice: "File uploaded successfully."
+        if @media_file.save
+          redirect_to folder_media_files_path(@folder), notice: "File uploaded successfully."
+        else
+          Rails.logger.debug "MediaFile errors: #{@media_file.errors.full_messages}"
+          render :new
+        end
       else
-        Rails.logger.debug "MediaFile errors: #{@media_file.errors.full_messages}"
-        render :new
+        render :new, alert: "Please select a file to upload."
       end
     else
-      render :new, alert: "Please select a file to upload."
+      redirect_to folder_media_files_path(@folder), alert: 'Нямате права да качвате файлове в тази папка.'
     end
   end
 
