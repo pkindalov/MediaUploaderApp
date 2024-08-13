@@ -19,35 +19,53 @@ Follow these steps to run a local copy of the project:
    ```bash
    git clone https://github.com/your-username/MediaUploaderApp.git
    cd MediaUploaderApp
+   ```
+
+2. **Install dependencies**:
+```bash
+bundle install
+```
+
+3. **Set up the database**:
+```bash
+rails db:migrate
+```
+
+4. **Configure environment variables**:
+
+- Create a .env file in the root project directory.
+- Add the following content to the .env file
+```bash
+MAIN_DIR_NAME=MediaUploader
+DISK_MOUNT_POINT=E:/
+```
+
+5. **Ignore the .env file**:
+```bash
+Add .env to your .gitignore file to prevent it from being tracked by Git.
+
+6. **Configure your application**:
+- In config/environments/development.rb, add the following:
+```bash
+main_dir_name = ENV.fetch('MAIN_DIR_NAME', 'MediaUploader')
+disk_mount_point = ENV.fetch('DISK_MOUNT_POINT', 'E:/')
+config.user_files_path = File.join(disk_mount_point, main_dir_name)
+```
+
+- In app/controllers/home_controller.rb, update the index method to use:
+  ```bash
+  @disk_usage = calculate_disk_usage(ENV.fetch('DISK_MOUNT_POINT', 'E:/'))
   ```
 
-2. **Install dependencies:
+7. **Start the server**:
 ```bash
-  bundle install
+rails server
 ```
 
-3. **Set up the database:
-```bash
-  rails db:migrate
-```
-4. **You must put your path to an external drive in config/environments/development
-```bash
-   Example: config.user_files_path = Rails.root.join("E:/MediaUploader")
-```
-
-5. **You must put your drive letter in home-controller on index method
-```bash
-   Example: @disk_usage = calculate_disk_usage('E:/') # Specify the correct mount point
-```
-
-6. **Start the server:
-```bash
-  rails server
-```
-
-#Project is still developing
-
-5. **Access the application:
+8. **Access the application**:
 ```bash
 The application will be available at http://localhost:3000.
 ```
+
+
+
