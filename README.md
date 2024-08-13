@@ -30,11 +30,22 @@ Follow these steps to run a local copy of the project:
 ```bash
   rails db:migrate
 ```
+4. **You must put your path to an external drive in config/environments/development
+```bash
+   Example: config.user_files_path = Rails.root.join("E:/MediaUploader")
+```
 
-4. **Start the server:
+5. **You must put your drive letter in home-controller on index method
+```bash
+   Example: @disk_usage = calculate_disk_usage('E:/') # Specify the correct mount point
+```
+
+6. **Start the server:
 ```bash
   rails server
 ```
+
+#Project is still developing
 
 5. **Access the application:
 ```bash
