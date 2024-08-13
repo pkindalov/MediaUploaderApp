@@ -48,6 +48,7 @@ gem 'devise'
 gem 'exifr'
 gem 'font-awesome-sass', '~> 6.1'
 gem 'sassc-rails'
+gem 'sys-filesystem'
 gem 'will_paginate'
 gem 'will_paginate-bootstrap', '~> 1.0.2'
 
