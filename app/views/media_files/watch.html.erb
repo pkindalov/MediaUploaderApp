@@ -1,7 +1,7 @@
 <div class="container mt-5">
-  <h1 class="mb-4 text-center">
+  <h3 class="mb-4 text-center">
     <i class="fas fa-video"></i> Гледане на видео: <%= @media_file.file %>
-  </h1>
+  </h3>
 
   <div class="video-player mb-4 d-flex justify-content-center" id="video-player">
     <video class="video-fluid" controls autoplay>
@@ -10,26 +10,11 @@
     </video>
   </div>
 
-<!--  <div class="text-center">-->
-    <%#= link_to folder_media_files_path(@folder), class: 'btn btn-secondary' do %>
-<!--      <i class="fas fa-arrow-left"></i> Назад-->
-    <%# end %>
-<!--  </div>-->
+  <!--  <div class="text-center">-->
+  <%#= link_to folder_media_files_path(@folder), class: 'btn btn-secondary' do %>
+  <!--      <i class="fas fa-arrow-left"></i> Назад-->
+  <%# end %>
+  <!--  </div>-->
 </div>
 
-<style>
-    .video-player video {
-        max-height: 80vh; /* Задаване на максимална височина на 80% от височината на прозореца */
-        width: auto; /* Автоматична ширина, за да се запазят пропорциите */
-        height: auto; /* Автоматична височина, за да се запазят пропорциите */
-    }
-</style>
-
-<script>
-    window.onload = function() {
-        const videoPlayer = document.getElementById("video-player");
-        if (videoPlayer) {
-            videoPlayer.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-    };
-</script>
+<%= javascript_include_tag "watch.js", defer: true %>
