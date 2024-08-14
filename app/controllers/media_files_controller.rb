@@ -28,9 +28,15 @@ class MediaFilesController < ApplicationController
   def create
     if @folder.user == current_user
       if params[:media_file].present? && params[:media_file][:files].present?
-        params[:media_file][:files].each do |uploaded_file|
-          next if uploaded_file.blank?  # Пропускаме празни стойности
+        # Пропускане на празни стойности преди проверката
+        valid_files = params[:media_file][:files].reject(&:blank?)
 
+        if valid_files.size > ENV.fetch('MAX_FILES_UPLOAD_AT_ONCE').to_i
+          redirect_to new_folder_media_file_path(@folder), alert: "Можете да качвате до #{ENV.fetch('MAX_FILES_UPLOAD_AT_ONCE')} файла наведнъж."
+          return
+        end
+
+        valid_files.each do |uploaded_file|
           file_name_with_extension = save_file_to_physical_folder(uploaded_file)
           @media_file = @folder.media_files.new(file: file_name_with_extension)
 
@@ -118,7 +124,7 @@ class MediaFilesController < ApplicationController
     file_name_with_extension = uploaded_file.original_filename
     file_path = File.join(user_folder_path, file_name_with_extension)
 
-    File.open(file_path, "wb") do |file|
+    File.open(file_path, 'wb') do |file|
       file.write(uploaded_file.read)
     end
 
@@ -154,7 +160,7 @@ class MediaFilesController < ApplicationController
         false
       end
     else
-      Rails.logger.warn "File not found, treating as successful deletion."
+      Rails.logger.warn 'File not found, treating as successful deletion.'
       true
     end
   end
