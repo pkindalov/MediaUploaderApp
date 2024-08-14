@@ -80,7 +80,14 @@
   <% else %>
     <p>Все още няма файлове в тази директория</p>
   <% end %>
+
 </div>
+
+<%= link_to folders_path, class: 'btn btn-primary mr-2 mt-2 mb-5' do %>
+  <i class="fa-solid fa-arrow-left"></i> Назад
+<% end %>
+
+
 
 <!-- Gallery Modal -->
 <div class="modal fade" id="galleryModal" tabindex="-1" aria-labelledby="galleryModalLabel" aria-hidden="true">

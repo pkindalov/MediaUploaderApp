@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'exifr/jpeg' # Add this line to require the EXIFR library
+require 'exifr/jpeg'
 
 class MediaFilesController < ApplicationController
   before_action :set_folder, except: ['list_all_files']
@@ -14,8 +14,7 @@ class MediaFilesController < ApplicationController
   end
 
   def list_all_files
-    @files = MediaFile.order(created_at: :desc).paginate(page: params[:page],
-                                                         per_page: 50).order('created_at DESC')
+    @files = MediaFile.order(created_at: :desc).paginate(page: params[:page], per_page: 50).order('created_at DESC')
   end
 
   def new
@@ -28,19 +27,21 @@ class MediaFilesController < ApplicationController
 
   def create
     if @folder.user == current_user
-      if params[:media_file].present? && params[:media_file][:file].present?
-        uploaded_file = params[:media_file][:file]
-        file_name_with_extension = save_file_to_physical_folder(uploaded_file)
-        @media_file = @folder.media_files.new(file: file_name_with_extension)
+      if params[:media_file].present? && params[:media_file][:files].present?
+        params[:media_file][:files].each do |uploaded_file|
+          next if uploaded_file.blank?  # Пропускаме празни стойности
 
-        if @media_file.save
-          redirect_to folder_media_files_path(@folder), notice: "File uploaded successfully."
-        else
-          Rails.logger.debug "MediaFile errors: #{@media_file.errors.full_messages}"
-          render :new
+          file_name_with_extension = save_file_to_physical_folder(uploaded_file)
+          @media_file = @folder.media_files.new(file: file_name_with_extension)
+
+          unless @media_file.save
+            Rails.logger.debug "MediaFile errors: #{@media_file.errors.full_messages}"
+            render :new and return
+          end
         end
+        redirect_to folder_media_files_path(@folder), notice: "Файловете бяха успешно качени."
       else
-        render :new, alert: "Please select a file to upload."
+        render :new, alert: "Моля, изберете поне един файл за качване."
       end
     else
       redirect_to folder_media_files_path(@folder), alert: 'Нямате права да качвате файлове в тази папка.'
@@ -65,7 +66,7 @@ class MediaFilesController < ApplicationController
         render :edit
       end
     else
-      redirect_to folder_media_files_path(@folder), alert: 'Неуспешно преименуване на файлът. Може би сървърът използва файла. Ако имате отворен таб, в който гледате видеото вероятно трябва първо да го затворите. Или ако теглите файлът и все още не е изтеглен.'
+      redirect_to folder_media_files_path(@folder), alert: 'Неуспешно преименуване на файлът.'
     end
   end
 
@@ -75,11 +76,10 @@ class MediaFilesController < ApplicationController
     begin
       delete_physical_file(@media_file.file)
     rescue => e
-      # Rails.logger.error "Error deleting physical file: #{e.message}"
+      Rails.logger.error "Error deleting physical file: #{e.message}"
     ensure
-      # Независимо от успеха или провала при изтриването на файла, изтрий записа от базата данни
       @media_file.destroy
-      redirect_to folder_media_files_path(@folder), notice: 'File deleted successfully.'
+      redirect_to folder_media_files_path(@folder), notice: 'Файлът беше успешно изтрит.'
     end
   end
 
@@ -103,7 +103,7 @@ class MediaFilesController < ApplicationController
   end
 
   def media_file_params
-    params.require(:media_file).permit(:file)
+    params.require(:media_file).permit(:files)
   end
 
   def authorize_user_for_media_file!
@@ -171,7 +171,7 @@ class MediaFilesController < ApplicationController
           exif_data[media_file.id] = {
             date_time_original: exif.date_time_original,
             f_number: exif.f_number,
-            exposure_time: exif.exposure_time.to_s, # Convert Rational to String for display
+            exposure_time: exif.exposure_time.to_s,
             iso_speed_ratings: exif.iso_speed_ratings
           }
         end
