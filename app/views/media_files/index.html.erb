@@ -1,10 +1,17 @@
 <h1 class="mb-5">Съдържание на папка <%= @folder.name %></h1>
 
-<% if @folder.user == current_user %>
-  <%= link_to new_folder_media_file_path(@folder), class: 'btn btn-primary mb-3' do %>
-    <i class="fa-regular fa-file"></i> Качете файл
+<div class="d-flex mb-3 gap-2">
+  <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#galleryModal">
+    <i class="fas fa-images"></i> Галерия
+  </button>
+  <% if @folder.user == current_user %>
+
+    <%= link_to new_folder_media_file_path(@folder), class: 'btn btn-primary mr-2' do %>
+      <i class="fa-regular fa-file"></i> Качете файл
+    <% end %>
+
   <% end %>
-<% end %>
+</div>
 
 <div class="row">
   <% if @media_files.count > 0 %>
@@ -75,4 +82,37 @@
   <% else %>
     <p>Все още няма файлове в тази директория</p>
   <% end %>
+</div>
+
+<!-- Gallery Modal -->
+<div class="modal fade" id="galleryModal" tabindex="-1" aria-labelledby="galleryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="galleryModalLabel">Галерия</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Затвори"></button>
+      </div>
+      <div class="modal-body">
+        <div id="userImagesCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            <% @media_files.each_with_index do |media_file, index| %>
+              <% if ['.jpg', '.jpeg', '.png', '.gif'].include?(File.extname(media_file.file).downcase) %>
+                <div class="carousel-item <%= 'active' if index.zero? %>">
+                  <%= image_tag(serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}"), alt: media_file.file, class: 'd-block w-100') %>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#userImagesCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#userImagesCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
