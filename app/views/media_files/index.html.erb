@@ -5,11 +5,9 @@
     <i class="fas fa-images"></i> Галерия
   </button>
   <% if @folder.user == current_user %>
-
     <%= link_to new_folder_media_file_path(@folder), class: 'btn btn-primary mr-2' do %>
       <i class="fa-regular fa-file"></i> Качете файл
     <% end %>
-
   <% end %>
 </div>
 
@@ -20,7 +18,7 @@
       <div class="col-md-3 mb-4">
         <div class="card h-100">
           <div class="card-body text-center">
-            <% if ['.jpg', '.jpeg', '.png', '.gif'].include?(file_extension) %>
+            <% if %w[.jpg .jpeg .png .gif].include?(file_extension) %>
               <!-- Показване на изображение -->
               <a href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>">
                 <%= image_tag(serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}"), alt: media_file.file, class: 'img-fluid mb-2') %>
@@ -39,7 +37,7 @@
                   <p>Няма налична EXIF информация</p>
                 </div>
               <% end %>
-            <% elsif ['.mp4', '.webm', '.ogg', '.mov'].include?(file_extension) %>
+            <% elsif %w[.mp4 .webm .ogg .mov].include?(file_extension) %>
               <!-- Показване на икона за видео -->
               <div class="d-flex flex-column align-items-center mb-2">
                 <i class="fas fa-video fa-4x"></i>
@@ -96,7 +94,7 @@
         <div id="userImagesCarousel" class="carousel slide" data-bs-ride="carousel">
           <div class="carousel-inner">
             <% @media_files.each_with_index do |media_file, index| %>
-              <% if ['.jpg', '.jpeg', '.png', '.gif'].include?(File.extname(media_file.file).downcase) %>
+              <% if %w[.jpg .jpeg .png .gif].include?(File.extname(media_file.file).downcase) %>
                 <div class="carousel-item <%= 'active' if index.zero? %>">
                   <%= image_tag(serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}"), alt: media_file.file, class: 'd-block w-100') %>
                 </div>

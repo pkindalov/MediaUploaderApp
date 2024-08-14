@@ -33,7 +33,13 @@
         <li class="list-group-item">Няма качени папки.</li>
       <% end %>
     </ul>
+
+    <%= link_to list_folders_path, class: 'btn btn-primary mt-3 mb-2' do %>
+      <i class="fa-solid fa-folder-plus"></i> Всички Папки
+    <% end %>
+
   </div>
+
 
   <div>
     <h3>Последни качени файлове</h3>
@@ -53,7 +59,12 @@
         <li class="list-group-item">Няма качени файлове.</li>
       <% end %>
     </ul>
+
+    <%= link_to list_files_path, class: 'btn btn-primary mt-3 mb-5' do %>
+      <i class="fa-regular fa-file"></i> Всички Файлове
+    <% end %>
   </div>
 <% else %>
-  <p>Добре дошли! За да видите каченото съдържание, моля <%= link_to 'влезте', new_user_session_path %> или <%= link_to 'регистрирайте се', new_user_registration_path %>.</p>
+  <p>Добре дошли! За да видите каченото съдържание, моля <%= link_to 'влезте', new_user_session_path %>
+    или <%= link_to 'регистрирайте се', new_user_registration_path %>.</p>
 <% end %>

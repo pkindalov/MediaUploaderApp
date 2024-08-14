@@ -1,0 +1,23 @@
+<div>
+  <h3><i class="fa-solid fa-file"></i> Всички файлове</h3>
+  <ul class="list-group mt-4">
+    <% if @files.any? %>
+      <% @files.each do |media_file| %>
+        <li class="list-group-item">
+          <a href="<%= serve_media_file_path(file_path: "#{Rails.configuration.user_files_path}/#{media_file.folder.user.email}/#{media_file.folder.name}/#{media_file.file}") %>" target="_blank" class="text-decoration-none">
+            <%= media_file.file %>
+          </a>
+          <small class="text-muted">
+            - качен на <%= media_file.created_at.strftime("%d/%m/%Y") %> от <%= media_file.folder.user.email %>
+          </small>
+        </li>
+      <% end %>
+    <% else %>
+      <li class="list-group-item">Няма качени файлове.</li>
+    <% end %>
+  </ul>
+</div>
+
+<div class="text-center">
+  <%= will_paginate @files, renderer: BootstrapPagination::Rails %>
+</div>

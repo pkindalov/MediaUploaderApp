@@ -1,0 +1,22 @@
+<div class="mb-4">
+  <h3><i class="fa-solid fa-folder-plus"></i> Всички Папки</h3>
+  <ul class="list-group mt-5">
+    <% if @folders.any? %>
+      <% @folders.each do |folder| %>
+        <li class="list-group-item">
+          <%= link_to folder.name, folder_media_files_path(folder), class: 'text-decoration-none' %>
+          <small class="text-muted">
+            - качена на <%= folder.created_at.strftime("%d/%m/%Y") %> от <%= folder.user.email %>
+          </small>
+        </li>
+      <% end %>
+    <% else %>
+      <li class="list-group-item">Няма качени папки.</li>
+    <% end %>
+  </ul>
+</div>
+
+
+<div class="text-center">
+  <%= will_paginate @folders, renderer: BootstrapPagination::Rails %>
+</div>

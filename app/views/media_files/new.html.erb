@@ -1,8 +1,8 @@
-<h1>Upload New File</h1>
+<h1 class="mb-5">Качване на нов файл:</h1>
 <%= form_with model: [@folder, @media_file], local: true, html: { multipart: true } do |form| %>
   <div class="mb-3">
-    <%= form.label :file, class: 'form-label' %>
+    <%= form.label "Файл", class: 'form-label' %>
     <%= form.file_field :file, class: 'form-control' %>
   </div>
-  <%= form.submit 'Upload File', class: 'btn btn-primary' %>
+  <%= form.submit 'Качете', class: 'btn btn-primary' %>
 <% end %>

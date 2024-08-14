@@ -1,16 +1,21 @@
 # frozen_string_literal: true
 
-require 'exifr/jpeg'  # Add this line to require the EXIFR library
+require 'exifr/jpeg' # Add this line to require the EXIFR library
 
 class MediaFilesController < ApplicationController
-  before_action :set_folder
-  before_action :set_paths
+  before_action :set_folder, except: ['list_all_files']
+  before_action :set_paths, except: ['list_all_files']
   before_action :set_media_file, only: %i[edit update destroy watch]
   before_action :authenticate_user!, except: %i[index watch]
 
   def index
     @media_files = @folder.media_files.paginate(page: params[:page], per_page: 40).order('created_at DESC')
     @exif_data = extract_exif_data
+  end
+
+  def list_all_files
+    @files = MediaFile.order(created_at: :desc).paginate(page: params[:page],
+                                                         per_page: 50).order('created_at DESC')
   end
 
   def new

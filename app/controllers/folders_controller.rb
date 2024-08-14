@@ -9,6 +9,11 @@ class FoldersController < ApplicationController
     @folders = current_user.folders.paginate(page: params[:page], per_page: 40).order('created_at DESC')
   end
 
+  def list_all_folders
+    @folders = Folder.order(created_at: :desc).paginate(page: params[:page],
+                                                        per_page: 50).order('created_at DESC')
+  end
+
   def new
     @folder = current_user.folders.new
   end
@@ -17,14 +22,13 @@ class FoldersController < ApplicationController
     @folder = current_user.folders.new(folder_params)
     if @folder.save
       create_physical_folder_for_user(@folder)
-      redirect_to folders_path, notice: "Folder created successfully."
+      redirect_to folders_path, notice: 'Folder created successfully.'
     else
       render :new
     end
   end
 
-  def edit
-  end
+  def edit; end
 
   def update
     # Първо преименуваме директорията на външния диск
