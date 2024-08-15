@@ -1,11 +1,13 @@
 # app/controllers/home_controller.rb
 class HomeController < ApplicationController
+  include FolderSizeCalculator
   def index
     if current_user
       @recent_folders = Folder.order(created_at: :desc).limit(5)
       @recent_files = MediaFile.order(created_at: :desc).limit(5)
       disk_mount_point = ENV.fetch('DISK_MOUNT_POINT', 'E:/')
       @disk_usage = calculate_disk_usage(disk_mount_point)
+      @folder_sizes = calculate_folder_sizes(@recent_folders)
     end
   end
 

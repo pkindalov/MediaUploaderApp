@@ -28,6 +28,9 @@
               - качена на <%= folder.created_at.strftime("%d/%m/%Y") %> от <%= folder.user.email %>
             </small>
             <small class="text-primary">(<%= folder.media_files.count %> файла)</small>
+            <% if @folder_sizes[folder.id] %>
+              <small class="text-success"> - Размер: <%= number_to_human_size(@folder_sizes[folder.id]) %></small>
+            <% end %>
           </li>
         <% end %>
       <% else %>
@@ -38,8 +41,8 @@
     <%= link_to list_folders_path, class: 'btn btn-primary mt-3 mb-2' do %>
       <i class="fa-solid fa-folder-plus"></i> Всички Папки
     <% end %>
-
   </div>
+
 
   <div>
     <h3>Последни качени файлове</h3>
