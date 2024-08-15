@@ -78,14 +78,23 @@ class MediaFilesController < ApplicationController
 
   def destroy
     authorize_user_for_media_file!
+    return if performed? # Това ще прекрати изпълнението на метода, ако вече има извикване на redirect_to
+
+    success = true
 
     begin
-      delete_physical_file(@media_file.file)
+      success &&= delete_physical_file(@media_file.file)
     rescue => e
       Rails.logger.error "Error deleting physical file: #{e.message}"
+      success = false
     ensure
-      @media_file.destroy
-      redirect_to folder_media_files_path(@folder), notice: 'Файлът беше успешно изтрит.'
+      success &&= @media_file.destroy
+    end
+
+    if success
+      redirect_to folder_media_files_path(@folder), notice: "Media file was successfully deleted."
+    else
+      redirect_to folder_media_files_path(@folder), alert: "Failed to delete the media file."
     end
   end
 
@@ -109,11 +118,14 @@ class MediaFilesController < ApplicationController
   end
 
   def media_file_params
-    params.require(:media_file).permit(:files)
+    params.require(:media_file).permit(:file, :files)
   end
 
   def authorize_user_for_media_file!
-    redirect_to root_path, alert: 'Нямате права за тази операция.' unless @media_file.folder.user == current_user
+    unless @media_file.folder.user == current_user
+      redirect_to root_path
+      return
+    end
   end
 
   def save_file_to_physical_folder(uploaded_file)
@@ -132,6 +144,8 @@ class MediaFilesController < ApplicationController
   end
 
   def rename_physical_file(old_name, new_name)
+    return false if old_name.nil? || new_name.nil?
+
     old_path = File.join(@user_folder_path, old_name)
     new_path = File.join(@user_folder_path, new_name)
 

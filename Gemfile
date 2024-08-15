@@ -47,6 +47,7 @@ gem "bootsnap", require: false
 gem 'devise'
 gem 'exifr'
 gem 'font-awesome-sass', '~> 6.1'
+gem 'rails-controller-testing'
 gem 'sassc-rails'
 gem 'sys-filesystem'
 gem 'will_paginate'
@@ -55,8 +56,8 @@ gem 'will_paginate-bootstrap', '~> 1.0.2'
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ]
-  gem 'rubocop', require: false
   gem 'dotenv-rails'
+  gem 'rubocop', require: false
 end
 
 
