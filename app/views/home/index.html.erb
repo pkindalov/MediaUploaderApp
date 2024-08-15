@@ -50,8 +50,9 @@
             <a href="<%= serve_media_file_path(file_path: "#{Rails.configuration.user_files_path}/#{media_file.folder.user.email}/#{media_file.folder.name}/#{media_file.file}") %>" target="_blank" class="text-decoration-none">
               <%= media_file.file %>
             </a>
+            <% file_size = number_to_human_size(File.size("#{Rails.configuration.user_files_path}/#{media_file.folder.user.email}/#{media_file.folder.name}/#{media_file.file}")) %>
             <small class="text-muted">
-              - качен на <%= media_file.created_at.strftime("%d/%m/%Y") %> от <%= media_file.folder.user.email %>
+              - <%= file_size %>, качен на <%= media_file.created_at.strftime("%d/%m/%Y") %> от <%= media_file.folder.user.email %>
             </small>
           </li>
         <% end %>
@@ -59,6 +60,7 @@
         <li class="list-group-item">Няма качени файлове.</li>
       <% end %>
     </ul>
+
 
     <%= link_to list_files_path, class: 'btn btn-primary mt-3 mb-5' do %>
       <i class="fa-regular fa-file"></i> Всички Файлове

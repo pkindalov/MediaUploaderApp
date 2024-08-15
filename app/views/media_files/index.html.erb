@@ -58,7 +58,11 @@
             <% end %>
           </div>
           <div class="card-footer text-center">
-            <small class="text-muted"><%= media_file.file %></small>
+            <small class="text-muted">
+              <%= media_file.file %>
+              <% file_size = number_to_human_size(File.size("#{@user_folder_path}/#{media_file.file}")) %>
+              (<%= file_size %>)
+            </small>
             <% if media_file.folder.user == current_user %>
               <div class="mt-2">
                 <%= link_to edit_folder_media_file_path(@folder, media_file), class: 'btn btn-warning btn-sm' do %>
