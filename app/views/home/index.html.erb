@@ -3,11 +3,11 @@
 
   <% if @disk_usage %>
     <div class="disk-usage mb-4">
-      <h3>Disk Usage</h3>
+      <h3>Място на външното устройство</h3>
       <ul class="list-group">
-        <li class="list-group-item">Total Space: <%= @disk_usage[:total] %></li>
-        <li class="list-group-item">Used Space: <%= @disk_usage[:used] %> (<%= @disk_usage[:percent_used] %>%)</li>
-        <li class="list-group-item">Free Space: <%= @disk_usage[:free] %> (<%= @disk_usage[:percent_free] %>%)</li>
+        <li class="list-group-item">Общо пространство: <%= @disk_usage[:total] %></li>
+        <li class="list-group-item">Използвано пространство: <%= @disk_usage[:used] %> (<%= @disk_usage[:percent_used] %>%)</li>
+        <li class="list-group-item">Свободно пространство: <%= @disk_usage[:free] %> (<%= @disk_usage[:percent_free] %>%)</li>
       </ul>
     </div>
   <% else %>
@@ -27,6 +27,7 @@
             <small class="text-muted">
               - качена на <%= folder.created_at.strftime("%d/%m/%Y") %> от <%= folder.user.email %>
             </small>
+            <small class="text-primary">(<%= folder.media_files.count %> файла)</small>
           </li>
         <% end %>
       <% else %>
@@ -39,7 +40,6 @@
     <% end %>
 
   </div>
-
 
   <div>
     <h3>Последни качени файлове</h3>

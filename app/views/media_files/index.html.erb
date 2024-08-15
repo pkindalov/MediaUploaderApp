@@ -1,4 +1,4 @@
-<h1 class="mb-5">Съдържание на папка <%= @folder.name %></h1>
+<h1 class="mb-5">Съдържание на папка <%= @folder.name %> <small class="text-muted">(<%= @folder.media_files.count %> файла)</small></h1>
 
 <div class="d-flex mb-3 gap-2">
   <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#galleryModal">

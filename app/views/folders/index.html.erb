@@ -8,8 +8,10 @@
   <ul class="list-group mt-5">
     <% @folders.each do |folder| %>
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        <%= link_to folder.name, folder_media_files_path(folder), class: 'nav-link' %>
-
+        <div>
+          <%= link_to folder.name, folder_media_files_path(folder), class: 'nav-link d-inline text-primary' %>
+          <small class="text-muted">(<%= folder.media_files.count %> файла)</small>
+        </div>
         <div class="btn-group" role="group">
           <%= link_to edit_folder_path(folder), class: 'btn btn-secondary btn-sm' do %>
             <i class="fa-solid fa-pen-to-square"></i> Редактирай
