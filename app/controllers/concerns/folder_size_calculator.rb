@@ -7,17 +7,19 @@ module FolderSizeCalculator
   def calculate_folder_sizes(folders)
     folder_sizes = {}
     folders.each do |folder|
-      folder_sizes[folder.id] = calculate_single_folder_size(folder)
+      folder_size = folder.media_files.sum do |media_file|
+        file_path = "#{Rails.configuration.user_files_path}/#{folder.user.email}/#{folder.name}/#{media_file.file}"
+        File.exist?(file_path) ? File.size(file_path) : 0
+      end
+      folder_sizes[folder.id] = folder_size
     end
     folder_sizes
   end
 
   def calculate_single_folder_size(folder)
-    Rails.cache.fetch("folder_size_#{folder.id}", expires_in: 12.hours) do
-      folder.media_files.sum do |media_file|
-        file_path = "#{Rails.configuration.user_files_path}/#{folder.user.email}/#{folder.name}/#{media_file.file}"
-        File.size(file_path) if File.exist?(file_path)
-      end
+    folder.media_files.sum do |media_file|
+      file_path = "#{Rails.configuration.user_files_path}/#{folder.user.email}/#{folder.name}/#{media_file.file}"
+      File.exist?(file_path) ? File.size(file_path) : 0
     end
   end
 
@@ -27,5 +29,4 @@ module FolderSizeCalculator
     end
     number_to_human_size(total_size)
   end
-
 end

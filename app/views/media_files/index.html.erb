@@ -24,58 +24,69 @@
   <% if @media_files.count > 0 %>
     <% @media_files.each do |media_file| %>
       <% file_extension = File.extname(media_file.file).downcase %>
+      <% file_path = "#{@user_folder_path}/#{media_file.file}" %>
       <div class="col-md-3 mb-4">
         <div class="card h-100">
           <div class="card-body text-center">
-            <% if %w[.jpg .jpeg .png .gif].include?(file_extension) %>
-              <!-- Показване на изображение -->
-              <a href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>">
-                <%= image_tag(serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}"), alt: media_file.file, class: 'img-fluid mb-2') %>
-              </a>
-              <!-- EXIF Information -->
-              <% exif_info = @exif_data[media_file.id] %>
-              <% if exif_info && exif_info[:date_time_original] %>
-                <div class="exif-info text-start">
-                  <p>Дата на заснемане: <%= exif_info[:date_time_original] %></p>
-                  <p>Бленда: <%= exif_info[:f_number] %></p>
-                  <p>ISO: <%= exif_info[:iso_speed_ratings] %></p>
-                  <p>Време на експозиция: <%= exif_info[:exposure_time] %></p>
-                </div>
-              <% else %>
-                <div class="exif-info text-start">
-                  <p>Няма налична EXIF информация</p>
-                </div>
-              <% end %>
-            <% elsif %w[.mp4 .webm .ogg .mov].include?(file_extension) %>
-              <!-- Показване на икона за видео -->
-              <div class="d-flex flex-column align-items-center mb-2">
-                <i class="fas fa-video fa-4x"></i>
-                <!-- Бутон за гледане на видео -->
-                <a href="<%= watch_folder_media_file_path(@folder, media_file) %>" target="_blank" class="btn btn-primary mt-2">
-                  <i class="fas fa-play"></i> Гледай
+            <% if File.exist?(file_path) %>
+              <% if %w[.jpg .jpeg .png .gif].include?(file_extension) %>
+                <!-- Показване на изображение -->
+                <a href="<%= serve_media_file_path(file_path: file_path) %>">
+                  <%= image_tag(serve_media_file_path(file_path: file_path), alt: media_file.file, class: 'img-fluid mb-2') %>
                 </a>
-              </div>
-              <!-- Бутон за изтегляне -->
-              <a href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>" download class="btn btn-secondary mt-2">
-                <i class="fas fa-download"></i> Свали
-              </a>
+                <!-- EXIF Information -->
+                <% exif_info = @exif_data[media_file.id] %>
+                <% if exif_info && exif_info[:date_time_original] %>
+                  <div class="exif-info text-start">
+                    <p>Дата на заснемане: <%= exif_info[:date_time_original] %></p>
+                    <p>Бленда: <%= exif_info[:f_number] %></p>
+                    <p>ISO: <%= exif_info[:iso_speed_ratings] %></p>
+                    <p>Време на експозиция: <%= exif_info[:exposure_time] %></p>
+                  </div>
+                <% else %>
+                  <div class="exif-info text-start">
+                    <p>Няма налична EXIF информация</p>
+                  </div>
+                <% end %>
+              <% elsif %w[.mp4 .webm .ogg .mov].include?(file_extension) %>
+                <!-- Показване на икона за видео -->
+                <div class="d-flex flex-column align-items-center mb-2">
+                  <i class="fas fa-video fa-4x"></i>
+                  <!-- Бутон за гледане на видео -->
+                  <a href="<%= watch_folder_media_file_path(@folder, media_file) %>" target="_blank" class="btn btn-primary mt-2">
+                    <i class="fas fa-play"></i> Гледай
+                  </a>
+                </div>
+                <!-- Бутон за изтегляне -->
+                <a href="<%= serve_media_file_path(file_path: file_path) %>" download class="btn btn-secondary mt-2">
+                  <i class="fas fa-download"></i> Свали
+                </a>
+              <% else %>
+                <!-- Показване на икона с Font Awesome за неизвестен тип файл -->
+                <a href="<%= serve_media_file_path(file_path: file_path) %>">
+                  <i class="fas fa-file fa-4x mb-2"></i>
+                </a>
+              <% end %>
             <% else %>
-              <!-- Показване на икона с Font Awesome за неизвестен тип файл -->
-              <a href="<%= serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}") %>">
-                <i class="fas fa-file fa-4x mb-2"></i>
-              </a>
+              <span class="text-danger"><%= media_file.file %> (Файлът не е наличен. Може би е изтрит или преместен на друго устройство.)</span>
             <% end %>
           </div>
           <div class="card-footer text-center">
             <small class="text-muted">
               <%= media_file.file %>
-              <% file_size = number_to_human_size(File.size("#{@user_folder_path}/#{media_file.file}")) %>
-              (<%= file_size %>)
+              <% if File.exist?(file_path) %>
+                <% file_size = number_to_human_size(File.size(file_path)) %>
+                (<%= file_size %>)
+              <% else %>
+                <small class="text-danger">Файлът не е наличен.</small>
+              <% end %>
             </small>
             <% if media_file.folder.user == current_user %>
               <div class="mt-2">
-                <%= link_to edit_folder_media_file_path(@folder, media_file), class: 'btn btn-warning btn-sm' do %>
-                  <i class="fas fa-edit"></i> Преименувай
+                <% if File.exist?(file_path) %>
+                  <%= link_to edit_folder_media_file_path(@folder, media_file), class: 'btn btn-warning btn-sm' do %>
+                    <i class="fas fa-edit"></i> Преименувай
+                  <% end %>
                 <% end %>
                 <%= link_to folder_media_file_path(@folder, media_file), method: :delete, data: { confirm: 'Сигурни ли сте?' }, class: 'btn btn-danger btn-sm' do %>
                   <i class="fas fa-trash-alt"></i> Изтрий
@@ -83,6 +94,8 @@
               </div>
             <% end %>
           </div>
+
+
         </div>
       </div>
     <% end %>
@@ -114,9 +127,14 @@
         <div id="userImagesCarousel" class="carousel slide" data-bs-ride="carousel">
           <div class="carousel-inner">
             <% @media_files.each_with_index do |media_file, index| %>
-              <% if %w[.jpg .jpeg .png .gif].include?(File.extname(media_file.file).downcase) %>
+              <% file_path = "#{@user_folder_path}/#{media_file.file}" %>
+              <% if File.exist?(file_path) && %w[.jpg .jpeg .png .gif].include?(File.extname(media_file.file).downcase) %>
                 <div class="carousel-item <%= 'active' if index.zero? %>">
-                  <%= image_tag(serve_media_file_path(file_path: "#{@user_folder_path}/#{media_file.file}"), alt: media_file.file, class: 'd-block w-100') %>
+                  <%= image_tag(serve_media_file_path(file_path: file_path), alt: media_file.file, class: 'd-block w-100') %>
+                </div>
+              <% else %>
+                <div class="carousel-item <%= 'active' if index.zero? %>">
+                  <span class="text-danger">Изображението не е налично.</span>
                 </div>
               <% end %>
             <% end %>

@@ -50,20 +50,24 @@
       <% if @recent_files.any? %>
         <% @recent_files.each do |media_file| %>
           <li class="list-group-item">
-            <a href="<%= serve_media_file_path(file_path: "#{Rails.configuration.user_files_path}/#{media_file.folder.user.email}/#{media_file.folder.name}/#{media_file.file}") %>" target="_blank" class="text-decoration-none">
-              <%= media_file.file %>
-            </a>
-            <% file_size = number_to_human_size(File.size("#{Rails.configuration.user_files_path}/#{media_file.folder.user.email}/#{media_file.folder.name}/#{media_file.file}")) %>
-            <small class="text-muted">
-              - <%= file_size %>, качен на <%= media_file.created_at.strftime("%d/%m/%Y") %> от <%= media_file.folder.user.email %>
-            </small>
+            <% file_path = "#{Rails.configuration.user_files_path}/#{media_file.folder.user.email}/#{media_file.folder.name}/#{media_file.file}" %>
+            <% if File.exist?(file_path) %>
+              <a href="<%= serve_media_file_path(file_path: file_path) %>" target="_blank" class="text-decoration-none">
+                <%= media_file.file %>
+              </a>
+              <% file_size = number_to_human_size(File.size(file_path)) %>
+              <small class="text-muted">
+                - <%= file_size %>, качен на <%= media_file.created_at.strftime("%d/%m/%Y") %> от <%= media_file.folder.user.email %>
+              </small>
+            <% else %>
+              <span class="text-danger"><%= media_file.file %> (Файлът не е наличен. Може би е изтрит или преместен на друго устройство.)</span>
+            <% end %>
           </li>
         <% end %>
       <% else %>
         <li class="list-group-item">Няма качени файлове.</li>
       <% end %>
     </ul>
-
 
     <%= link_to list_files_path, class: 'btn btn-primary mt-3 mb-5' do %>
       <i class="fa-regular fa-file"></i> Всички Файлове
