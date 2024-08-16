@@ -3,6 +3,7 @@
 require 'exifr/jpeg'
 
 class MediaFilesController < ApplicationController
+  include FolderSizeCalculator
   before_action :set_folder, except: ['list_all_files']
   before_action :set_paths, except: ['list_all_files']
   before_action :set_media_file, only: %i[edit update destroy watch]
@@ -11,6 +12,7 @@ class MediaFilesController < ApplicationController
   def index
     @media_files = @folder.media_files.paginate(page: params[:page], per_page: 40).order('created_at DESC')
     @exif_data = extract_exif_data
+    @folder_size = calculate_single_folder_size(@folder)
   end
 
   def list_all_files

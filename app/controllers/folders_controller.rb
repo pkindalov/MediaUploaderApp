@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class FoldersController < ApplicationController
+  include FolderSizeCalculator
   before_action :authenticate_user!
   before_action :set_folder, only: %i[edit update destroy]
 
@@ -12,6 +13,8 @@ class FoldersController < ApplicationController
   def list_all_folders
     @folders = Folder.order(created_at: :desc).paginate(page: params[:page],
                                                         per_page: 50).order('created_at DESC')
+    @folder_sizes = calculate_folder_sizes(@folders)
+    @total_size = calculate_total_size(@folders)
   end
 
   def new

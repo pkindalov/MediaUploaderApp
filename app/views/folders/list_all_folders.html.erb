@@ -1,5 +1,7 @@
 <div class="mb-4">
   <h3><i class="fa-solid fa-folder-plus"></i> Всички Папки</h3>
+  <h6>Общ размер на всички папки: <%= @total_size %></h6>
+
   <ul class="list-group mt-5">
     <% if @folders.any? %>
       <% @folders.each do |folder| %>
@@ -9,6 +11,9 @@
             - качена на <%= folder.created_at.strftime("%d/%m/%Y") %> от <%= folder.user.email %>
           </small>
           <small class="text-primary">(<%= folder.media_files.count %> файла)</small>
+          <% if @folder_sizes[folder.id] %>
+            <small class="text-success"> - Размер: <%= number_to_human_size(@folder_sizes[folder.id]) %></small>
+          <% end %>
         </li>
       <% end %>
     <% else %>
