@@ -1,0 +1,81 @@
+<!-- app/views/users/show.html.erb -->
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-3">
+      <!-- Потребителска информация -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h4>Профил на потребителя</h4>
+        </div>
+        <div class="card-body text-center">
+          <h5 class="card-title"><%= @user.email %></h5>
+          <p class="card-text">
+            <strong>Създаден на:</strong> <%= @user.created_at.strftime("%d/%m/%Y") %>
+          </p>
+          <%= link_to 'Редактирай профил', edit_user_registration_path, class: 'btn btn-primary' %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-9">
+      <!-- Последни папки -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h4>Последни качени папки</h4>
+        </div>
+        <ul class="list-group list-group-flush">
+          <% if @folders.any? %>
+            <% @folders.each do |folder| %>
+              <li class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <%= link_to folder.name, folder_media_files_path(folder), class: 'text-decoration-none' %>
+                    <small class="text-muted"> - качена на <%= folder.created_at.strftime("%d/%m/%Y") %></small>
+                  </div>
+                  <small class="text-primary"><%= folder.media_files.count %> файла</small>
+                </div>
+              </li>
+            <% end %>
+          <% else %>
+            <li class="list-group-item">Няма качени папки.</li>
+          <% end %>
+        </ul>
+        <div class="card-footer">
+          <%= will_paginate @folders, param_name: 'folders_page', renderer: BootstrapPagination::Rails %>
+        </div>
+      </div>
+
+      <!-- Последни файлове -->
+      <div class="card">
+        <div class="card-header">
+          <h4>Последни качени файлове</h4>
+        </div>
+        <ul class="list-group list-group-flush">
+          <% if @media_files.any? %>
+            <% @media_files.each do |media_file| %>
+              <% file_path = "#{Rails.configuration.user_files_path}/#{media_file.folder.user.email}/#{media_file.folder.name}/#{media_file.file}" %>
+              <li class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <% if File.exist?(file_path) %>
+                      <%= link_to media_file.file, watch_folder_media_file_path(media_file.folder, media_file), class: 'text-decoration-none' %>
+                      <small class="text-muted"> - качен на <%= media_file.created_at.strftime("%d/%m/%Y") %></small>
+                      <small class="text-muted"><%= number_to_human_size(File.size(file_path)) %></small>
+                    <% else %>
+                      <span class="text-danger"><%= media_file.file %> (Файлът не е наличен. Може би е изтрит или преместен на друго устройство.)</span>
+                    <% end %>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+          <% else %>
+            <li class="list-group-item">Няма качени файлове.</li>
+          <% end %>
+        </ul>
+        <div class="card-footer">
+          <%= will_paginate @media_files, param_name: 'files_page', renderer: BootstrapPagination::Rails %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

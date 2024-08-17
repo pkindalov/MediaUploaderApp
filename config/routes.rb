@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get 'users/show'
   devise_for :users
 
   get '/folders/listAllFolders', to: 'folders#list_all_folders', as: 'list_folders'
@@ -12,6 +13,7 @@ Rails.application.routes.draw do
     end
   end
 
+  get '/users/:id', to: 'users#show', as: 'user_profile'
   get '/serve_media_file', to: 'downloads#serve', as: 'serve_media_file'
   root to: 'home#index'
 end

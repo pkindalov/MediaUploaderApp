@@ -8,7 +8,10 @@
         <li class="list-group-item">
           <%= link_to folder.name, folder_media_files_path(folder), class: 'text-decoration-none' %>
           <small class="text-muted">
-            - качена на <%= folder.created_at.strftime("%d/%m/%Y") %> от <%= folder.user.email %>
+            - качена на <%= folder.created_at.strftime("%d/%m/%Y") %> от
+            <%= link_to user_profile_path(folder.user), class: 'text-decoration-none' do %>
+              <%= folder.user.email %>
+            <% end %>
           </small>
           <small class="text-primary">(<%= folder.media_files.count %> файла)</small>
           <% if @folder_sizes[folder.id] %>
@@ -21,7 +24,6 @@
     <% end %>
   </ul>
 </div>
-
 
 <div class="text-center">
   <%= will_paginate @folders, renderer: BootstrapPagination::Rails %>

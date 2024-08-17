@@ -1,5 +1,13 @@
 <% if current_user %>
-  <h1 class="mb-5">Добре дошли в MediaUploaderApp</h1>
+  <div class="mb-4">
+    <h1 class="mb-5">Добре дошли в MediaUploaderApp</h1>
+
+    <!-- Линк към профила на потребителя -->
+    <p>
+      <strong>Вашият профил:</strong>
+      <%= link_to current_user.email, user_profile_path(current_user), class: 'text-decoration-none' %>
+    </p>
+  </div>
 
   <% if @disk_usage %>
     <div class="disk-usage mb-4">
@@ -42,7 +50,6 @@
       <i class="fa-solid fa-folder-plus"></i> Всички Папки
     <% end %>
   </div>
-
 
   <div>
     <h3>Последни качени файлове</h3>
