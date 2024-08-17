@@ -26,14 +26,21 @@
         <ul class="list-group list-group-flush">
           <% if @folders.any? %>
             <% @folders.each do |folder| %>
-              <li class="list-group-item">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                    <%= link_to folder.name, folder_media_files_path(folder), class: 'text-decoration-none' %>
-                    <small class="text-muted"> - качена на <%= folder.created_at.strftime("%d/%m/%Y") %></small>
-                  </div>
-                  <small class="text-primary"><%= folder.media_files.count %> файла</small>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <%= link_to folder.name, folder_media_files_path(folder), class: 'text-decoration-none' %>
+                  <small class="text-muted"> - качена на <%= folder.created_at.strftime("%d/%m/%Y") %></small>
+                  <small class="text-primary d-block"><%= folder.media_files.count %> файла</small>
+                  <% if @folder_sizes && @folder_sizes[folder.id] %>
+                    <small class="text-success d-block"> - Размер: <%= number_to_human_size(@folder_sizes[folder.id]) %></small>
+                  <% end %>
                 </div>
+                <% if current_user == folder.user %>
+                  <div class="btn-group">
+                    <%= link_to 'Редактирай', edit_folder_path(folder), class: 'btn btn-sm btn-warning' %>
+                    <%= link_to 'Изтрий', folder_path(folder), method: :delete, data: { confirm: 'Сигурни ли сте, че искате да изтриете тази папка?' }, class: 'btn btn-sm btn-danger' %>
+                  </div>
+                <% end %>
               </li>
             <% end %>
           <% else %>
@@ -65,6 +72,14 @@
                       <span class="text-danger"><%= media_file.file %> (Файлът не е наличен. Може би е изтрит или преместен на друго устройство.)</span>
                     <% end %>
                   </div>
+                  <% if current_user == media_file.folder.user %>
+                    <div>
+                      <% if File.exist?(file_path) %>
+                        <%= link_to 'Преименувай', edit_folder_media_file_path(media_file.folder, media_file), class: 'btn btn-sm btn-warning' %>
+                      <% end %>
+                      <%= link_to 'Изтрий', folder_media_file_path(media_file.folder, media_file), method: :delete, data: { confirm: 'Сигурни ли сте, че искате да изтриете този файл?' }, class: 'btn btn-sm btn-danger' %>
+                    </div>
+                  <% end %>
                 </div>
               </li>
             <% end %>

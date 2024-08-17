@@ -4,11 +4,17 @@
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav">
+    <ul class="navbar-nav ms-auto">
       <% if user_signed_in? %>
         <li class="nav-item">
           <%= link_to folders_path, class: 'nav-link' do %>
             <i class="fa-solid fa-folder-plus"></i> Мое Съдържание
+          <% end %>
+        </li>
+        <!-- Линк към профила на потребителя -->
+        <li class="nav-item">
+          <%= link_to user_profile_path(current_user), class: 'nav-link' do %>
+            <i class="fa-solid fa-user"></i> Профил
           <% end %>
         </li>
         <li class="nav-item">
