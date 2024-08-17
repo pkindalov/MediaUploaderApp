@@ -26,7 +26,7 @@
                   <%= image_tag(serve_media_file_path(file_path: file_path), alt: media_file.file, class: 'img-fluid mb-2') %>
                 </a>
                 <!-- Бутон за изтегляне на изображение -->
-                <a href="<%= serve_media_file_path(file_path: file_path) %>" download class="btn btn-secondary mt-2">
+                <a href="<%= serve_media_file_path(file_path: file_path) %>" download class="btn btn-secondary mt-2 mb-4">
                   <i class="fas fa-download"></i> Свали изображение
                 </a>
                 <!-- EXIF Information -->
@@ -114,37 +114,4 @@
   <% end %>
 </div>
 
-<!-- Gallery Modal -->
-<div class="modal fade" id="galleryModal" tabindex="-1" aria-labelledby="galleryModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="galleryModalLabel">Галерия - <%= @folder.name %></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Затвори"></button>
-      </div>
-      <div class="modal-body">
-        <div id="userImagesCarousel" class="carousel slide" data-bs-ride="carousel">
-          <div class="carousel-inner">
-            <% gallery_files = @media_files.select { |media_file| %w[.jpg .jpeg .png .gif].include?(File.extname(media_file.file).downcase) } %>
-            <% gallery_files.each_with_index do |media_file, index| %>
-              <% file_path = "#{@user_folder_path}/#{media_file.file}" %>
-              <% if File.exist?(file_path) %>
-                <div class="carousel-item <%= 'active' if index.zero? %>">
-                  <%= image_tag(serve_media_file_path(file_path: file_path), alt: media_file.file, class: 'd-block w-100') %>
-                </div>
-              <% end %>
-            <% end %>
-          </div>
-          <button class="carousel-control-prev" type="button" data-bs-target="#userImagesCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#userImagesCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<%= render "shared/carousel", media_files: @media_files %>
