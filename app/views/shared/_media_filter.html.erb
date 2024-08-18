@@ -1,6 +1,15 @@
 <!-- app/views/shared/_media_filter.html.erb -->
-<div class="media-filter mb-3">
-  <%= link_to 'Всички', request.path, class: "btn btn-primary #{'active' unless params[:filter]}" %>
-  <%= link_to 'Снимки', request.path + "?filter=images", class: "btn btn-primary #{'active' if params[:filter] == 'images'}" %>
-  <%= link_to 'Видеа', request.path + "?filter=videos", class: "btn btn-primary #{'active' if params[:filter] == 'videos'}" %>
-</div>
+<!-- Бутон за филтър за всички файлове -->
+<%= link_to url_for(filter: nil), class: 'btn btn-outline-secondary' do %>
+  <i class="fas fa-filter"></i> Всички файлове
+<% end %>
+
+<!-- Бутон за филтър за изображения -->
+<%= link_to url_for(filter: 'images'), class: 'btn btn-outline-primary ml-2' do %>
+  <i class="fas fa-image"></i> Снимки
+<% end %>
+
+<!-- Бутон за филтър за видеа -->
+<%= link_to url_for(filter: 'videos'), class: 'btn btn-outline-info ml-2' do %>
+  <i class="fas fa-video"></i> Видеа
+<% end %>
