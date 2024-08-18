@@ -1,7 +1,7 @@
 <div>
   <h3 class="mb-4 text-center"><i class="fa-solid fa-file"></i> Всички файлове</h3>
 
-  <div class="d-flex flex-column flex-md-row align-items-center gap-1 mb-4">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-1 mb-4">
     <%= render 'shared/media_filter' %>
     <!-- Бутон за галерията -->
     <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#galleryModal">
@@ -18,7 +18,23 @@
             <div class="d-flex align-items-center">
               <% if File.exist?(file_path) %>
                 <% if %w[.jpg .jpeg .png .gif].include?(File.extname(media_file.file).downcase) %>
-                  <%= image_tag(serve_media_file_path(file_path: file_path), alt: media_file.file, class: 'img-thumbnail mr-3', size: '75x75') %>
+                  <!-- Thumbnail, който при клик отваря модален прозорец -->
+                  <%= image_tag(serve_media_file_path(file_path: file_path), alt: media_file.file, class: 'img-thumbnail mr-3', size: '75x75', data: { bs_toggle: 'modal', bs_target: "#imageModal-#{media_file.id}" }) %>
+
+                  <!-- Модален прозорец за показване на снимката -->
+                  <div class="modal fade" id="imageModal-<%= media_file.id %>" tabindex="-1" aria-labelledby="imageModalLabel-<%= media_file.id %>" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="imageModalLabel-<%= media_file.id %>"><%= media_file.file %></h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                          <%= image_tag(serve_media_file_path(file_path: file_path), alt: media_file.file, class: 'img-fluid') %>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 <% elsif %w[.mp4 .webm .ogg .mov].include?(File.extname(media_file.file).downcase) %>
                   <i class="fas fa-video fa-3x me-3"></i>
                 <% elsif %w[.mkv].include?(File.extname(media_file.file).downcase) %>
