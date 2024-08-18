@@ -1,86 +1,97 @@
 <% if current_user %>
-  <div class="mb-4">
-    <h1 class="mb-5">Добре дошли в MediaUploaderApp</h1>
-
-    <!-- Линк към профила на потребителя -->
-    <p>
-      <strong>Вашият профил:</strong>
-      <%= link_to current_user.email, user_profile_path(current_user), class: 'text-decoration-none' %>
-    </p>
-  </div>
-
-  <% if @disk_usage %>
-    <div class="disk-usage mb-4">
-      <h3>Място на външното устройство</h3>
-      <ul class="list-group">
-        <li class="list-group-item">Общо пространство: <%= @disk_usage[:total] %></li>
-        <li class="list-group-item">Използвано пространство: <%= @disk_usage[:used] %> (<%= @disk_usage[:percent_used] %>%)</li>
-        <li class="list-group-item">Свободно пространство: <%= @disk_usage[:free] %> (<%= @disk_usage[:percent_free] %>%)</li>
-      </ul>
+  <div class="container mt-4">
+    <div class="text-center mb-5">
+      <h1 class="display-4">Добре дошли в MediaUploaderApp</h1>
+      <p class="lead">Вашият профил: <%= link_to current_user.email, user_profile_path(current_user), class: 'text-decoration-none' %></p>
     </div>
-  <% else %>
-    <div class="alert alert-warning">
-      Външното устройство не е свързано. Моля, свържете го, за да видите информация за дисковото пространство.
-      Също така няма да може да виждате файловете, които се качили
+
+    <% if @disk_usage %>
+      <div class="alert alert-info text-center mb-5">
+        <h4>Място на външното устройство</h4>
+        <p>Общо пространство: <strong><%= @disk_usage[:total] %></strong></p>
+        <p>Използвано пространство: <strong><%= @disk_usage[:used] %></strong> (<%= @disk_usage[:percent_used] %>%)</p>
+        <p>Свободно пространство: <strong><%= @disk_usage[:free] %></strong> (<%= @disk_usage[:percent_free] %>%)</p>
+      </div>
+    <% else %>
+      <div class="alert alert-warning text-center mb-5">
+        Външното устройство не е свързано. Моля, свържете го, за да видите информация за дисковото пространство.
+        Също така няма да може да виждате файловете, които сте качили.
+      </div>
+    <% end %>
+
+    <div class="row">
+      <div class="col-lg-6 mb-5">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h3 class="card-title">Последни качени папки</h3>
+            <ul class="list-group list-group-flush">
+              <% if @recent_folders.any? %>
+                <% @recent_folders.each do |folder| %>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                      <%= link_to folder.name, folder_media_files_path(folder), class: 'text-decoration-none' %>
+                      <small class="text-muted d-block">
+                        качена на <%= folder.created_at.strftime("%d/%m/%Y") %> от <%= folder.user.email %>
+                      </small>
+                      <% if @folder_sizes[folder.id] %>
+                        <small class="text-success">Размер: <%= number_to_human_size(@folder_sizes[folder.id]) %></small>
+                      <% end %>
+                    </div>
+                    <span class="badge bg-primary rounded-pill"><%= folder.media_files.count %> файла</span>
+                  </li>
+                <% end %>
+              <% else %>
+                <li class="list-group-item text-center">Няма качени папки.</li>
+              <% end %>
+            </ul>
+          </div>
+          <div class="card-footer text-center">
+            <%= link_to list_folders_path, class: 'btn btn-primary' do %>
+              <i class="fa-solid fa-folder-plus"></i> Всички Папки
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 mb-5">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h3 class="card-title">Последни качени файлове</h3>
+            <ul class="list-group list-group-flush">
+              <% if @recent_files.any? %>
+                <% @recent_files.each do |media_file| %>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                      <% file_path = "#{Rails.configuration.user_files_path}/#{media_file.folder.user.email}/#{media_file.folder.name}/#{media_file.file}" %>
+                      <% if File.exist?(file_path) %>
+                        <a href="<%= serve_media_file_path(file_path: file_path) %>" target="_blank" class="text-decoration-none">
+                          <%= media_file.file %>
+                        </a>
+                        <% file_size = number_to_human_size(File.size(file_path)) %>
+                        <small class="text-muted d-block">
+                          <%= file_size %>, качен на <%= media_file.created_at.strftime("%d/%m/%Y") %> от <%= media_file.folder.user.email %>
+                        </small>
+                      <% else %>
+                        <span class="text-danger"><%= media_file.file %> (Файлът не е наличен. Може би е изтрит или преместен на друго устройство.)</span>
+                      <% end %>
+                    </div>
+                  </li>
+                <% end %>
+              <% else %>
+                <li class="list-group-item text-center">Няма качени файлове.</li>
+              <% end %>
+            </ul>
+          </div>
+          <div class="card-footer text-center">
+            <%= link_to list_files_path, class: 'btn btn-primary' do %>
+              <i class="fa-regular fa-file"></i> Всички Файлове
+            <% end %>
+          </div>
+        </div>
+      </div>
     </div>
-  <% end %>
-
-  <div class="mb-4">
-    <h3>Последни качени папки</h3>
-    <ul class="list-group">
-      <% if @recent_folders.any? %>
-        <% @recent_folders.each do |folder| %>
-          <li class="list-group-item">
-            <%= link_to folder.name, folder_media_files_path(folder), class: 'text-decoration-none' %>
-            <small class="text-muted">
-              - качена на <%= folder.created_at.strftime("%d/%m/%Y") %> от <%= folder.user.email %>
-            </small>
-            <small class="text-primary">(<%= folder.media_files.count %> файла)</small>
-            <% if @folder_sizes[folder.id] %>
-              <small class="text-success"> - Размер: <%= number_to_human_size(@folder_sizes[folder.id]) %></small>
-            <% end %>
-          </li>
-        <% end %>
-      <% else %>
-        <li class="list-group-item">Няма качени папки.</li>
-      <% end %>
-    </ul>
-
-    <%= link_to list_folders_path, class: 'btn btn-primary mt-3 mb-2' do %>
-      <i class="fa-solid fa-folder-plus"></i> Всички Папки
-    <% end %>
-  </div>
-
-  <div>
-    <h3>Последни качени файлове</h3>
-    <ul class="list-group">
-      <% if @recent_files.any? %>
-        <% @recent_files.each do |media_file| %>
-          <li class="list-group-item">
-            <% file_path = "#{Rails.configuration.user_files_path}/#{media_file.folder.user.email}/#{media_file.folder.name}/#{media_file.file}" %>
-            <% if File.exist?(file_path) %>
-              <a href="<%= serve_media_file_path(file_path: file_path) %>" target="_blank" class="text-decoration-none">
-                <%= media_file.file %>
-              </a>
-              <% file_size = number_to_human_size(File.size(file_path)) %>
-              <small class="text-muted">
-                - <%= file_size %>, качен на <%= media_file.created_at.strftime("%d/%m/%Y") %> от <%= media_file.folder.user.email %>
-              </small>
-            <% else %>
-              <span class="text-danger"><%= media_file.file %> (Файлът не е наличен. Може би е изтрит или преместен на друго устройство.)</span>
-            <% end %>
-          </li>
-        <% end %>
-      <% else %>
-        <li class="list-group-item">Няма качени файлове.</li>
-      <% end %>
-    </ul>
-
-    <%= link_to list_files_path, class: 'btn btn-primary mt-3 mb-5' do %>
-      <i class="fa-regular fa-file"></i> Всички Файлове
-    <% end %>
   </div>
 <% else %>
-  <p>Добре дошли! За да видите каченото съдържание, моля <%= link_to 'влезте', new_user_session_path %>
+  <p class="text-center">Добре дошли! За да видите каченото съдържание, моля <%= link_to 'влезте', new_user_session_path %>
     или <%= link_to 'регистрирайте се', new_user_registration_path %>.</p>
 <% end %>

@@ -1,18 +1,17 @@
-<h1 class="mb-4"><%= @folder.name %></h1>
+<h1 class="mb-4 text-center"><%= @folder.name %></h1>
 
-
-<div class="d-flex justify-content-between mb-4">
-  <div>
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+  <div class="d-flex gap-2">
     <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#galleryModal">
       <i class="fas fa-images"></i> Галерия
     </button>
     <% if @folder.user == current_user %>
-      <%= link_to new_folder_media_file_path(@folder), class: 'btn btn-primary ml-2' do %>
+      <%= link_to new_folder_media_file_path(@folder), class: 'btn btn-primary' do %>
         <i class="fa-regular fa-file"></i> Качете файл
       <% end %>
     <% end %>
   </div>
-  <div>
+  <div class="d-flex justify-content-end gap-2">
     <%= render 'shared/media_filter' %>
   </div>
 </div>
@@ -22,8 +21,8 @@
     <% @media_files.each do |media_file| %>
       <% file_extension = File.extname(media_file.file).downcase %>
       <% file_path = "#{@user_folder_path}/#{media_file.file}" %>
-      <div class="col-md-3 mb-4">
-        <div class="card h-100">
+      <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+        <div class="card h-100 shadow-sm">
           <div class="card-body text-center">
             <% if File.exist?(file_path) %>
               <% if %w[.jpg .jpeg .png .gif].include?(file_extension) %>
