@@ -5,6 +5,7 @@ require 'exifr/jpeg'
 class MediaFilesController < ApplicationController
   include FolderSizeCalculator
   include FileSorting
+  include MediaFilter
   before_action :set_folder, except: ['list_all_files']
   before_action :set_paths, except: ['list_all_files']
   before_action :set_media_file, only: %i[edit update destroy watch]
@@ -17,14 +18,18 @@ class MediaFilesController < ApplicationController
     # Уверяваме се, че sorted_files е масив, дори и да няма файлове
     sorted_files ||= []
 
-    @media_files = WillPaginate::Collection.create(params[:page] || 1, 40, sorted_files.size) do |pager|
+    # Приложи филтъра по тип на файловете
+    filtered_files = filter_media_files(sorted_files, params[:filter])
+
+    @media_files = WillPaginate::Collection.create(params[:page] || 1, 40, filtered_files.size) do |pager|
       # Ако sorted_files е празен, pager.offset и pager.per_page ще бъдат безопасни
-      pager.replace(sorted_files[pager.offset, pager.per_page].to_a)
+      pager.replace(filtered_files[pager.offset, pager.per_page].to_a)
     end
 
     @exif_data = extract_exif_data
     @folder_size = calculate_single_folder_size(@folder)
   end
+
 
   def list_all_files
     files = MediaFile.order(created_at: :desc)

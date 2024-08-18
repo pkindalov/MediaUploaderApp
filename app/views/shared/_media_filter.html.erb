@@ -1,0 +1,6 @@
+<!-- app/views/shared/_media_filter.html.erb -->
+<div class="media-filter mb-3">
+  <%= link_to 'Всички', request.path, class: "btn btn-primary #{'active' unless params[:filter]}" %>
+  <%= link_to 'Снимки', request.path + "?filter=images", class: "btn btn-primary #{'active' if params[:filter] == 'images'}" %>
+  <%= link_to 'Видеа', request.path + "?filter=videos", class: "btn btn-primary #{'active' if params[:filter] == 'videos'}" %>
+</div>

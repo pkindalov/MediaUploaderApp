@@ -1,5 +1,10 @@
 <h1><%= @folder.name %></h1>
 
+<!-- Добавен филтър за типове файлове -->
+<div class="mb-4">
+  <%= render 'shared/media_filter' %>
+</div>
+
 <div class="d-flex mb-3 gap-2">
   <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#galleryModal">
     <i class="fas fa-images"></i> Галерия
