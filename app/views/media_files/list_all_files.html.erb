@@ -1,5 +1,8 @@
 <div>
   <h3><i class="fa-solid fa-file"></i> Всички файлове</h3>
+  <div class="d-flex justify-content-end gap-2">
+    <%= render 'shared/media_filter' %>
+  </div>
   <ul class="list-group mt-4">
     <% if @files.any? %>
       <% @files.each do |media_file| %>

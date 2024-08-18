@@ -30,16 +30,16 @@ class MediaFilesController < ApplicationController
     @folder_size = calculate_single_folder_size(@folder)
   end
 
-
   def list_all_files
     files = MediaFile.order(created_at: :desc)
     sorted_files = sort_files_by_availability(files)
 
     # Уверяваме се, че sorted_files е масив, дори и да няма файлове
     sorted_files ||= []
+    filtered_files = filter_media_files(sorted_files, params[:filter])
 
-    @files = WillPaginate::Collection.create(params[:page] || 1, 50, sorted_files.size) do |pager|
-      pager.replace(sorted_files[pager.offset, pager.per_page].to_a)
+    @files = WillPaginate::Collection.create(params[:page] || 1, 50, filtered_files.size) do |pager|
+      pager.replace(filtered_files[pager.offset, pager.per_page].to_a)
     end
   end
 
