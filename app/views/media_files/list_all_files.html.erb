@@ -1,8 +1,12 @@
 <div>
   <h3 class="mb-4 text-center"><i class="fa-solid fa-file"></i> Всички файлове</h3>
 
-  <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 mb-4">
+  <div class="d-flex flex-column flex-md-row align-items-center gap-1 mb-4">
     <%= render 'shared/media_filter' %>
+    <!-- Бутон за галерията -->
+    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#galleryModal">
+      <i class="fas fa-images"></i> Галерия
+    </button>
   </div>
 
   <ul class="list-group mt-4">
@@ -12,10 +16,18 @@
         <li class="list-group-item">
           <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-              <% if %w[.jpg .jpeg .png .gif].include?(File.extname(media_file.file).downcase) && File.exist?(file_path) %>
-                <%= image_tag(serve_media_file_path(file_path: file_path), alt: media_file.file, class: 'img-thumbnail mr-3', size: '50x50') %>
+              <% if File.exist?(file_path) %>
+                <% if %w[.jpg .jpeg .png .gif].include?(File.extname(media_file.file).downcase) %>
+                  <%= image_tag(serve_media_file_path(file_path: file_path), alt: media_file.file, class: 'img-thumbnail mr-3', size: '75x75') %>
+                <% elsif %w[.mp4 .webm .ogg .mov].include?(File.extname(media_file.file).downcase) %>
+                  <i class="fas fa-video fa-3x me-3"></i>
+                <% elsif %w[.mkv].include?(File.extname(media_file.file).downcase) %>
+                  <i class="fas fa-ban fa-3x text-danger me-3"></i>
+                <% end %>
+              <% else %>
+                <i class="fas fa-exclamation-triangle fa-3x text-warning me-3"></i>
               <% end %>
-              <div>
+              <div class="ms-3">
                 <% if File.exist?(file_path) %>
                   <a href="<%= serve_media_file_path(file_path: file_path) %>" target="_blank" class="text-decoration-none">
                     <%= media_file.file %>
@@ -57,3 +69,6 @@
 <div class="text-center">
   <%= will_paginate @files, renderer: BootstrapPagination::Rails %>
 </div>
+
+<!-- Рендерираме карусела с предаване на изображенията -->
+<%= render "shared/carousel", media_files: @files.select { |file| %w[.jpg .jpeg .png .gif].include?(File.extname(file.file).downcase) } %>
