@@ -8,7 +8,7 @@ Rails.application.routes.draw do
   resources :folders do
     resources :media_files, only: %i[index new create edit update destroy] do
       member do
-        get :watch # Добавяме нов маршрут за гледане на видеото
+        get :watch
       end
     end
   end
