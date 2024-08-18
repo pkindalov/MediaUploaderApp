@@ -1,46 +1,50 @@
 <div>
-  <h3><i class="fa-solid fa-file"></i> Всички файлове</h3>
-  <div class="d-flex justify-content-end gap-2">
+  <h3 class="mb-4 text-center"><i class="fa-solid fa-file"></i> Всички файлове</h3>
+
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 mb-4">
     <%= render 'shared/media_filter' %>
   </div>
+
   <ul class="list-group mt-4">
     <% if @files.any? %>
       <% @files.each do |media_file| %>
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <% file_path = "#{Rails.configuration.user_files_path}/#{media_file.folder.user.email}/#{media_file.folder.name}/#{media_file.file}" %>
-          <div class="d-flex align-items-center">
-            <% if File.exist?(file_path) %>
-              <% file_extension = File.extname(media_file.file).downcase %>
+        <% file_path = "#{Rails.configuration.user_files_path}/#{media_file.folder.user.email}/#{media_file.folder.name}/#{media_file.file}" %>
+        <li class="list-group-item">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <% if %w[.jpg .jpeg .png .gif].include?(File.extname(media_file.file).downcase) && File.exist?(file_path) %>
+                <%= image_tag(serve_media_file_path(file_path: file_path), alt: media_file.file, class: 'img-thumbnail mr-3', size: '50x50') %>
+              <% end %>
+              <div>
+                <% if File.exist?(file_path) %>
+                  <a href="<%= serve_media_file_path(file_path: file_path) %>" target="_blank" class="text-decoration-none">
+                    <%= media_file.file %>
+                  </a>
+                  <% file_size = number_to_human_size(File.size(file_path)) %>
+                  <small class="text-muted">
+                    - <%= file_size %>, качен на <%= media_file.created_at.strftime("%d/%m/%Y") %> от <%= media_file.folder.user.email %>
+                  </small>
+                <% else %>
+                  <span class="text-danger"><%= media_file.file %> (Файлът не е наличен)</span>
+                <% end %>
+              </div>
+            </div>
 
-              <% if %w[.jpg .jpeg .png .gif].include?(file_extension) %>
-                <%= image_tag serve_media_file_path(file_path: file_path), alt: media_file.file, class: 'img-thumbnail me-2', style: 'width: 50px; height: 50px;' %>
+            <div class="mt-2 mt-md-0 d-flex flex-wrap gap-2">
+              <% if %w[.mp4 .webm .ogg .mov].include?(File.extname(media_file.file).downcase) && File.exist?(file_path) %>
+                <%= link_to watch_folder_media_file_path(media_file.folder, media_file), target: '_blank', class: 'btn btn-sm btn-info' do %>
+                  <i class="fas fa-play"></i> Гледай
+                <% end %>
               <% end %>
-
-              <a href="<%= serve_media_file_path(file_path: file_path) %>" target="_blank" class="text-decoration-none">
-                <%= media_file.file %>
-              </a>
-              <% file_size = number_to_human_size(File.size(file_path)) %>
-              <small class="text-muted">
-                - <%= file_size %>, качен на <%= media_file.created_at.strftime("%d/%m/%Y") %> от <%= media_file.folder.user.email %>
-              </small>
-            <% else %>
-              <span class="text-danger"><%= media_file.file %> (Файлът не е наличен)</span>
-            <% end %>
-          </div>
-          <div class="d-flex gap-2">
-            <% if File.exist?(file_path) && %w[.mp4 .webm .ogg .mov].include?(file_extension) %>
-              <%= link_to watch_folder_media_file_path(media_file.folder, media_file), target: "_blank", class: 'btn btn-primary btn-sm' do %>
-                <i class="fas fa-play"></i> Гледай
+              <%= link_to serve_media_file_path(file_path: file_path), download: true, class: 'btn btn-sm btn-secondary' do %>
+                <i class="fas fa-download"></i> Свали
               <% end %>
-            <% end %>
-            <%= link_to serve_media_file_path(file_path: file_path), download: true, class: 'btn btn-secondary btn-sm' do %>
-              <i class="fas fa-download"></i> Свали
-            <% end %>
-            <% if media_file.folder.user == current_user %>
-              <%= link_to folder_media_file_path(media_file.folder, media_file), method: :delete, data: { confirm: 'Сигурни ли сте, че искате да изтриете този файл?' }, class: 'btn btn-danger btn-sm' do %>
-                <i class="fas fa-trash-alt"></i> Изтрий
+              <% if media_file.folder.user == current_user %>
+                <%= link_to folder_media_file_path(media_file.folder, media_file), method: :delete, data: { confirm: 'Сигурни ли сте, че искате да изтриете този файл?' }, class: 'btn btn-sm btn-danger' do %>
+                  <i class="fas fa-trash-alt"></i> Изтрий
+                <% end %>
               <% end %>
-            <% end %>
+            </div>
           </div>
         </li>
       <% end %>
