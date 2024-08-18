@@ -4,19 +4,38 @@ require 'exifr/jpeg'
 
 class MediaFilesController < ApplicationController
   include FolderSizeCalculator
+  include FileSorting
   before_action :set_folder, except: ['list_all_files']
   before_action :set_paths, except: ['list_all_files']
   before_action :set_media_file, only: %i[edit update destroy watch]
   before_action :authenticate_user!, except: %i[index watch]
 
   def index
-    @media_files = @folder.media_files.paginate(page: params[:page], per_page: 40).order('created_at DESC')
+    media_files = @folder.media_files.order('created_at DESC')
+    sorted_files = sort_files_by_availability(media_files)
+
+    # Уверяваме се, че sorted_files е масив, дори и да няма файлове
+    sorted_files ||= []
+
+    @media_files = WillPaginate::Collection.create(params[:page] || 1, 40, sorted_files.size) do |pager|
+      # Ако sorted_files е празен, pager.offset и pager.per_page ще бъдат безопасни
+      pager.replace(sorted_files[pager.offset, pager.per_page].to_a)
+    end
+
     @exif_data = extract_exif_data
     @folder_size = calculate_single_folder_size(@folder)
   end
 
   def list_all_files
-    @files = MediaFile.order(created_at: :desc).paginate(page: params[:page], per_page: 50).order('created_at DESC')
+    files = MediaFile.order(created_at: :desc)
+    sorted_files = sort_files_by_availability(files)
+
+    # Уверяваме се, че sorted_files е масив, дори и да няма файлове
+    sorted_files ||= []
+
+    @files = WillPaginate::Collection.create(params[:page] || 1, 50, sorted_files.size) do |pager|
+      pager.replace(sorted_files[pager.offset, pager.per_page].to_a)
+    end
   end
 
   def new

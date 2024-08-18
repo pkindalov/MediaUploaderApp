@@ -1,10 +1,12 @@
 # app/controllers/home_controller.rb
 class HomeController < ApplicationController
   include FolderSizeCalculator
+  include FileSorting
+
   def index
     if current_user
       @recent_folders = Folder.order(created_at: :desc).limit(5)
-      @recent_files = MediaFile.order(created_at: :desc).limit(5)
+      @recent_files = sort_files_by_availability(MediaFile.order(created_at: :desc).limit(5))
       disk_mount_point = ENV.fetch('DISK_MOUNT_POINT', 'E:/')
       @disk_usage = calculate_disk_usage(disk_mount_point)
       @folder_sizes = calculate_folder_sizes(@recent_folders)
@@ -38,7 +40,7 @@ class HomeController < ApplicationController
   def bytes_to_human(bytes)
     units = ['B', 'KB', 'MB', 'GB', 'TB']
     e = (Math.log(bytes) / Math.log(1024)).floor
-    s = "%.2f" % (bytes.to_f / 1024**e)
+    s = "%.2f" % (bytes.to_f / 1024 ** e)
     "#{s} #{units[e]}"
   end
 end
