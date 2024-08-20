@@ -54,8 +54,10 @@
 
       <!-- Последни файлове -->
       <div class="card">
-        <div class="card-header">
+        <div class="card-header d-flex gap-3 align-items-center">
           <h4>Последни качени файлове</h4>
+          <!-- Филтър за файлове -->
+          <%= render 'shared/media_filter' %>
         </div>
         <ul class="list-group list-group-flush">
           <% if @media_files.any? %>

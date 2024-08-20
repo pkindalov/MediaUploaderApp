@@ -1,6 +1,7 @@
 # app/controllers/users_controller.rb
 class UsersController < ApplicationController
   include FileSorting
+  include MediaFilter # Добавяне на MediaFilter, за да се използва филтрирането
   before_action :set_user, only: [:show]
 
   def show
@@ -11,6 +12,7 @@ class UsersController < ApplicationController
 
     media_files = @user.media_files.order('created_at DESC')
     sorted_files = sort_files_by_availability(media_files)
+    sorted_files = filter_media_files(sorted_files, params[:filter]) # Приложи филтъра по тип на файловете
     sorted_files ||= []
 
     @media_files = WillPaginate::Collection.create(params[:files_page] || 1, 50, sorted_files.size) do |pager|
