@@ -21,7 +21,7 @@
       <!-- Последни папки -->
       <div class="card mb-4">
         <div class="card-header">
-          <h4>Последни качени папки</h4>
+          <h4>Последно качени папки</h4>
         </div>
         <ul class="list-group list-group-flush">
           <% if @folders.any? %>
@@ -32,13 +32,18 @@
                   <small class="text-muted"> - качена на <%= folder.created_at.strftime("%d/%m/%Y") %></small>
                   <small class="text-primary d-block"><%= folder.media_files.count %> файла</small>
                   <% if @folder_sizes && @folder_sizes[folder.id] %>
-                    <small class="text-success d-block"> - Размер: <%= number_to_human_size(@folder_sizes[folder.id]) %></small>
+                    <small class="text-success d-block"> -
+                      Размер: <%= number_to_human_size(@folder_sizes[folder.id]) %></small>
                   <% end %>
                 </div>
                 <% if current_user == folder.user %>
                   <div class="btn-group">
-                    <%= link_to 'Редактирай', edit_folder_path(folder), class: 'btn btn-sm btn-warning' %>
-                    <%= link_to 'Изтрий', folder_path(folder), method: :delete, data: { confirm: 'Сигурни ли сте, че искате да изтриете тази папка?' }, class: 'btn btn-sm btn-danger' %>
+                    <%= link_to edit_folder_path(folder), class: 'btn btn-sm btn-warning' do %>
+                      <i class="fas fa-edit"></i> 'Редактирай'
+                    <% end %>
+                    <%= link_to folder_path(folder), method: :delete, data: { confirm: 'Сигурни ли сте, че искате да изтриете тази папка?' }, class: 'btn btn-sm btn-danger' do %>
+                      <i class="fas fa-trash-alt"></i> Изтрий
+                    <% end %>
                   </div>
                 <% end %>
               </li>
@@ -55,8 +60,7 @@
       <!-- Последни файлове -->
       <div class="card">
         <div class="card-header d-flex gap-3 align-items-center">
-          <h4>Последни качени файлове</h4>
-          <!-- Филтър за файлове -->
+          <h4>Последно качени файлове</h4>
           <%= render 'shared/media_filter' %>
         </div>
         <ul class="list-group list-group-flush">
@@ -65,25 +69,69 @@
               <% file_path = "#{Rails.configuration.user_files_path}/#{media_file.folder.user.email}/#{media_file.folder.name}/#{media_file.file}" %>
               <li class="list-group-item">
                 <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                    <% if File.exist?(file_path) %>
-                      <%= link_to media_file.file, watch_folder_media_file_path(media_file.folder, media_file), class: 'text-decoration-none' %>
-                      <small class="text-muted"> - качен на <%= media_file.created_at.strftime("%d/%m/%Y") %></small>
-                      <small class="text-muted"><%= number_to_human_size(File.size(file_path)) %></small>
+                  <div class="d-flex align-items-center gap-2">
+                    <% if %w[.jpg .jpeg .png .gif].include?(File.extname(media_file.file).downcase) && File.exist?(file_path) %>
+                      <%= image_tag(serve_media_file_path(file_path: file_path), alt: media_file.file, class: 'img-thumbnail mr-3', size: '50x50', data: { bs_toggle: "modal", bs_target: "#imageModal-#{media_file.id}" }) %>
+                    <% elsif %w[.mp4 .webm .ogg .mov].include?(File.extname(media_file.file).downcase) && File.exist?(file_path) %>
+                      <i class="fas fa-video fa-3x mr-3"></i>
                     <% else %>
-                      <span class="text-danger"><%= media_file.file %> (Файлът не е наличен. Може би е изтрит или преместен на друго устройство.)</span>
+                      <i class="fas fa-exclamation-triangle fa-3x text-warning mr-3"></i>
+                    <% end %>
+                    <div>
+                      <% truncated_file_name = media_file.file.length > 30 ? "#{media_file.file[0..30]}..." : media_file.file %>
+                      <% if File.exist?(file_path) %>
+                        <a href="<%= serve_media_file_path(file_path: file_path) %>" target="_blank" class="text-decoration-none">
+                          <%= truncated_file_name %>
+                        </a>
+                        <small class="text-muted">
+                          - качен на <%= media_file.created_at.strftime("%d/%m/%Y") %>
+                        </small>
+                        <small class="text-muted d-block">
+                          <%= number_to_human_size(File.size(file_path)) %>
+                        </small>
+                      <% else %>
+                        <span class="text-danger"><%= truncated_file_name %> (Файлът не е наличен)</span>
+                      <% end %>
+                    </div>
+                  </div>
+                  <div class="mt-2 mt-md-0 d-flex flex-wrap gap-2">
+                    <% if %w[.mp4 .webm .ogg .mov].include?(File.extname(media_file.file).downcase) && File.exist?(file_path) %>
+                      <%= link_to watch_folder_media_file_path(media_file.folder, media_file), target: '_blank', class: 'btn btn-sm btn-info' do %>
+                        <i class="fas fa-play"></i> Гледай
+                      <% end %>
+                    <% end %>
+                    <%= link_to serve_media_file_path(file_path: file_path), download: true, class: 'btn btn-sm btn-secondary' do %>
+                      <i class="fas fa-download"></i> Свали
+                    <% end %>
+                    <% if current_user == media_file.folder.user %>
+                      <%= link_to edit_folder_media_file_path(media_file.folder, media_file), class: 'btn btn-sm btn-warning' do %>
+                        <i class="fas fa-edit"></i> Преименувай
+                      <% end %>
+                      <%= link_to folder_media_file_path(media_file.folder, media_file), method: :delete, data: { confirm: 'Сигурни ли сте, че искате да изтриете този файл?' }, class: 'btn btn-sm btn-danger' do %>
+                        <i class="fas fa-trash-alt"></i> Изтрий
+                      <% end %>
                     <% end %>
                   </div>
-                  <% if current_user == media_file.folder.user %>
-                    <div>
-                      <% if File.exist?(file_path) %>
-                        <%= link_to 'Преименувай', edit_folder_media_file_path(media_file.folder, media_file), class: 'btn btn-sm btn-warning' %>
-                      <% end %>
-                      <%= link_to 'Изтрий', folder_media_file_path(media_file.folder, media_file), method: :delete, data: { confirm: 'Сигурни ли сте, че искате да изтриете този файл?' }, class: 'btn btn-sm btn-danger' %>
-                    </div>
-                  <% end %>
                 </div>
               </li>
+
+              <!-- Модален прозорец за изображенията -->
+              <div class="modal fade" id="imageModal-<%= media_file.id %>" tabindex="-1" aria-labelledby="imageModalLabel-<%= media_file.id %>" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="imageModalLabel-<%= media_file.id %>"><%= media_file.file %></h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Затвори"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                      <%= image_tag(serve_media_file_path(file_path: file_path), alt: media_file.file, class: 'img-fluid') %>
+                      <a href="<%= serve_media_file_path(file_path: file_path) %>" download class="btn btn-primary mt-3">
+                        <i class="fas fa-download"></i> Свали изображение
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
             <% end %>
           <% else %>
             <li class="list-group-item">Няма качени файлове.</li>
