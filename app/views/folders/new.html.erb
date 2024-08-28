@@ -4,5 +4,13 @@
     <%= form.label :name, class: 'form-label' %>
     <%= form.text_field :name, class: 'form-control' %>
   </div>
-  <%= form.submit 'Create Folder', class: 'btn btn-primary' %>
+
+  <div class="mb-3">
+    <%= form.label :parent_id, "Parent Folder", class: 'form-label' %>
+    <%= form.collection_select :parent_id, current_user.folders, :id, :name, include_blank: true, class: 'form-control' %>
+  </div>
+
+  <%= form.submit 'Save Folder', class: 'btn btn-primary' %>
 <% end %>
+
+
