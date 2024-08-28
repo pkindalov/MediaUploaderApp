@@ -98,7 +98,7 @@ class FoldersController < ApplicationController
     user_folder_path = File.join(root_path, current_user.email)
 
     if folder
-      parent_folder_path = folder.parent ? File.join(user_folder_path, folder.parent.name) : user_folder_path
+      parent_folder_path = folder.parent ? File.join(user_folder_path, build_path_for_parent(folder.parent)) : user_folder_path
       folder_path = File.join(parent_folder_path, folder.name)
       FileUtils.mkdir_p(folder_path) unless Dir.exist?(folder_path)
     else
@@ -106,42 +106,48 @@ class FoldersController < ApplicationController
     end
   end
 
+  def build_path_for_parent(parent_folder)
+    # Рекурсивно строим пътя на родителската папка
+    if parent_folder.parent
+      File.join(build_path_for_parent(parent_folder.parent), parent_folder.name)
+    else
+      parent_folder.name
+    end
+  end
+
   def rename_physical_folder_for_user(folder)
     root_path = Rails.configuration.user_files_path
     user_folder_path = File.join(root_path, current_user.email)
 
-    old_folder_path = File.join(user_folder_path, folder.parent&.name.to_s, folder.name_was)
-    new_folder_path = File.join(user_folder_path, folder_params[:parent_id].present? ? Folder.find(folder_params[:parent_id]).name : '', folder_params[:name])
+    old_folder_path = File.join(user_folder_path, build_path_for_parent(folder_was_parent(folder)), folder.name_was)
+    new_folder_path = File.join(user_folder_path, build_path_for_parent(folder.parent), folder_params[:name])
 
     return unless Dir.exist?(old_folder_path) && old_folder_path != new_folder_path
 
-    temp_folder_path = File.join(user_folder_path, "temp_#{SecureRandom.hex}")
-
     begin
-      FileUtils.mkdir_p(temp_folder_path)
-      FileUtils.mv(Dir["#{old_folder_path}/*"], temp_folder_path)
-      FileUtils.mkdir_p(new_folder_path)
-      FileUtils.mv(Dir["#{temp_folder_path}/*"], new_folder_path)
-      FileUtils.rm_rf(old_folder_path)
-      FileUtils.rm_rf(temp_folder_path)
+      FileUtils.mv(old_folder_path, new_folder_path)
     rescue => e
       Rails.logger.error "Error renaming folder: #{e.message}"
       raise
     end
   end
 
+  def folder_was_parent(folder)
+    Folder.find_by(id: folder.parent_id_was)
+  end
+
   def delete_descendants(folder)
     folder.subfolders.each do |subfolder|
       delete_descendants(subfolder)
-      delete_physical_folder(subfolder)
+      delete_physical_folder(subfolder) # Уверяваме се, че физическата папка също се изтрива
       subfolder.destroy
     end
   end
 
   def delete_physical_folder(folder)
     root_path = Rails.configuration.user_files_path
-    user_folder_path = File.join(root_path, current_user.email)
-    folder_path = File.join(user_folder_path, folder.parent&.name.to_s, folder.name)
+    user_folder_path = File.join(root_path, folder.user.email)
+    folder_path = File.join(user_folder_path, build_path_for_parent(folder.parent), folder.name)
 
     if Dir.exist?(folder_path)
       begin
@@ -156,4 +162,13 @@ class FoldersController < ApplicationController
       Rails.logger.warn "Folder at #{folder_path} does not exist, skipping physical deletion."
     end
   end
+
+  def build_path_for_parent(parent_folder)
+    if parent_folder
+      File.join(build_path_for_parent(parent_folder.parent), parent_folder.name)
+    else
+      ''
+    end
+  end
+
 end
