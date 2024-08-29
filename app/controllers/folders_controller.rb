@@ -106,35 +106,54 @@ class FoldersController < ApplicationController
     end
   end
 
-  def build_path_for_parent(parent_folder)
-    # Рекурсивно строим пътя на родителската папка
-    if parent_folder.parent
-      File.join(build_path_for_parent(parent_folder.parent), parent_folder.name)
-    else
-      parent_folder.name
-    end
-  end
 
   def rename_physical_folder_for_user(folder)
     root_path = Rails.configuration.user_files_path
     user_folder_path = File.join(root_path, current_user.email)
 
+    # Построяване на стария и новия път
     old_folder_path = File.join(user_folder_path, build_path_for_parent(folder_was_parent(folder)), folder.name_was)
-    new_folder_path = File.join(user_folder_path, build_path_for_parent(folder.parent), folder_params[:name])
+    new_folder_path = File.join(user_folder_path, build_path_for_parent(Folder.find_by(id: folder_params[:parent_id])), folder_params[:name])
 
-    return unless Dir.exist?(old_folder_path) && old_folder_path != new_folder_path
+    Rails.logger.info "Attempting to move folder from #{old_folder_path} to #{new_folder_path}"
+
+    # Ако старият път е същият като новия, няма нужда от преместване
+    if old_folder_path == new_folder_path
+      Rails.logger.info "No need to move folder. The path is the same."
+      return
+    end
+
+    # Уверяване, че новата директория съществува
+    FileUtils.mkdir_p(File.dirname(new_folder_path)) unless Dir.exist?(File.dirname(new_folder_path))
 
     begin
-      FileUtils.mv(old_folder_path, new_folder_path)
+      # Преместване на папката
+      if Dir.exist?(old_folder_path)
+        FileUtils.mv(old_folder_path, new_folder_path)
+        Rails.logger.info "Successfully moved folder from #{old_folder_path} to #{new_folder_path}"
+      else
+        Rails.logger.warn "Old folder path does not exist: #{old_folder_path}. Cannot move folder."
+      end
     rescue => e
-      Rails.logger.error "Error renaming folder: #{e.message}"
+      Rails.logger.error "Error moving folder from #{old_folder_path} to #{new_folder_path}: #{e.message}"
       raise
     end
   end
 
+
+
   def folder_was_parent(folder)
     Folder.find_by(id: folder.parent_id_was)
   end
+
+  def build_path_for_parent(parent_folder)
+    if parent_folder
+      File.join(build_path_for_parent(parent_folder.parent), parent_folder.name)
+    else
+      ''
+    end
+  end
+
 
   def delete_descendants(folder)
     folder.subfolders.each do |subfolder|
@@ -163,12 +182,5 @@ class FoldersController < ApplicationController
     end
   end
 
-  def build_path_for_parent(parent_folder)
-    if parent_folder
-      File.join(build_path_for_parent(parent_folder.parent), parent_folder.name)
-    else
-      ''
-    end
-  end
 
 end
