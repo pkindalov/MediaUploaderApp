@@ -28,16 +28,17 @@ module ApplicationHelper
     end
   end
 
-  def nested_folders_options(folders, parent_id = nil, level = 0)
+  def nested_folders_options(folders, parent_id = nil, level = 0, exclude_folder = nil)
     result = []
 
-    folders.select { |folder| folder.parent_id == parent_id }.each do |folder|
+    folders.select { |folder| folder.parent_id == parent_id && folder != exclude_folder }.each do |folder|
       result << ["#{"-" * level} #{folder.name}", folder.id]
-      result += nested_folders_options(folders, folder.id, level + 1)
+      result += nested_folders_options(folders, folder.id, level + 1, exclude_folder)
     end
 
     result
   end
+
 
   def folder_hierarchy_name(folder, level = 0)
     "#{'-' * level} #{folder.name}".strip
