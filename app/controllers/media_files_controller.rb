@@ -136,7 +136,7 @@ class MediaFilesController < ApplicationController
 
   def set_paths
     root_path = Rails.configuration.user_files_path
-    @user_folder_path = File.join(root_path, @folder.user.email, @folder.name)
+    @user_folder_path = File.join(root_path, @folder.user.email, @folder.full_path) # Променен за правилното построяване на пътя
   end
 
   def set_media_file
@@ -155,12 +155,10 @@ class MediaFilesController < ApplicationController
   end
 
   def save_file_to_physical_folder(uploaded_file)
-    root_path = Rails.configuration.user_files_path
-    user_folder_path = File.join(root_path, @folder.user.email, @folder.name)
-    FileUtils.mkdir_p(user_folder_path) unless Dir.exist?(user_folder_path)
+    FileUtils.mkdir_p(@user_folder_path) unless Dir.exist?(@user_folder_path)
 
     file_name_with_extension = uploaded_file.original_filename
-    file_path = File.join(user_folder_path, file_name_with_extension)
+    file_path = File.join(@user_folder_path, file_name_with_extension)
 
     File.open(file_path, 'wb') do |file|
       file.write(uploaded_file.read)

@@ -5,4 +5,13 @@ class Folder < ApplicationRecord
   has_many :media_files, dependent: :destroy
 
   validates :name, presence: true
+
+  # Метод за генериране на пълния път на папката
+  def full_path
+    if parent
+      File.join(parent.full_path, name)
+    else
+      name
+    end
+  end
 end
