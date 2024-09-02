@@ -12,8 +12,8 @@ class MediaFilesController < ApplicationController
   before_action :authenticate_user!, except: %i[index watch]
 
   def index
-    # Fetch all media files in the current folder and its subfolders
-    media_files = fetch_all_media_files(@folder)
+    # Fetch only media files in the current folder, not its subfolders
+    media_files = @folder.media_files.order('created_at DESC')
 
     # Sort the files based on availability
     sorted_files = sort_files_by_availability(media_files)
@@ -36,7 +36,11 @@ class MediaFilesController < ApplicationController
 
     # Calculate the size of the current folder and its subfolders
     @folder_size = calculate_single_folder_size(@folder)
+
+    # Fetch the subfolders to display as links
+    @subfolders = @folder.subfolders.order(:name)
   end
+
 
   def list_all_files
     files = MediaFile.order(created_at: :desc)

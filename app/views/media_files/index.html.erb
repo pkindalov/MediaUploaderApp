@@ -17,6 +17,18 @@
 </div>
 
 <div class="row">
+  <!-- Display subfolders as links -->
+  <% if @subfolders.present? %>
+    <% @subfolders.each do |subfolder| %>
+      <div class="col-12 mb-4">
+        <%= link_to folder_media_files_path(subfolder), class: 'btn btn-outline-primary' do %>
+          <i class="fas fa-folder"></i> <%= subfolder.name %>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <!-- Display media files in the current folder -->
   <% if @media_files.count > 0 %>
     <% @media_files.each do |media_file| %>
       <% file_extension = File.extname(media_file.file).downcase %>
@@ -26,11 +38,11 @@
           <div class="card-body text-center">
             <% if File.exist?(file_path) %>
               <% if %w[.jpg .jpeg .png .gif].include?(file_extension) %>
-                <!-- Показване на изображение -->
+                <!-- Display Image -->
                 <a href="<%= serve_media_file_path(file_path: file_path) %>">
                   <%= image_tag(serve_media_file_path(file_path: file_path), alt: media_file.file, class: 'img-fluid mb-2') %>
                 </a>
-                <!-- Бутон за изтегляне на изображение -->
+                <!-- Download Button -->
                 <a href="<%= serve_media_file_path(file_path: file_path) %>" download class="btn btn-secondary mt-2 mb-4">
                   <i class="fas fa-download"></i> Свали изображение
                 </a>
@@ -49,24 +61,24 @@
                   </div>
                 <% end %>
               <% elsif %w[.mp4 .webm .ogg .mov].include?(file_extension) %>
-                <!-- Показване на икона за видео -->
+                <!-- Display Video Icon -->
                 <div class="d-flex flex-column align-items-center mb-2">
                   <i class="fas fa-video fa-4x"></i>
-                  <!-- Бутон за гледане на видео -->
-                  <a href="<%= watch_folder_media_file_path(@folder, media_file) %>" target="_blank" class="btn btn-primary mt-2">
+                  <!-- Watch Video Button -->
+                  <a href="<%= watch_folder_media_file_path(@folder, media_file) %>" target="_blank" class='btn btn-primary mt-2'>
                     <i class="fas fa-play"></i> Гледай
                   </a>
-                  <!-- Бутон за изтегляне -->
-                  <a href="<%= serve_media_file_path(file_path: file_path) %>" download class="btn btn-secondary mt-2">
+                  <!-- Download Button -->
+                  <a href="<%= serve_media_file_path(file_path: file_path) %>" download class='btn btn-secondary mt-2'>
                     <i class="fas fa-download"></i> Свали
                   </a>
                 </div>
               <% else %>
-                <!-- Показване на икона с Font Awesome за неизвестен тип файл -->
+                <!-- Display Unsupported File Type Icon -->
                 <div class="d-flex flex-column align-items-center mb-2">
                   <i class="fas fa-file fa-4x mb-2"></i>
-                  <!-- Бутон за изтегляне за неподдържани видео формати или други файлове -->
-                  <a href="<%= serve_media_file_path(file_path: file_path) %>" download class="btn btn-secondary mt-2">
+                  <!-- Download Button -->
+                  <a href="<%= serve_media_file_path(file_path: file_path) %>" download class='btn btn-secondary mt-2'>
                     <i class="fas fa-download"></i> Свали
                   </a>
                 </div>
