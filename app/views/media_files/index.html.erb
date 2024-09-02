@@ -20,7 +20,7 @@
   <% if @media_files.count > 0 %>
     <% @media_files.each do |media_file| %>
       <% file_extension = File.extname(media_file.file).downcase %>
-      <% file_path = "#{@user_folder_path}/#{media_file.file}" %>
+      <% file_path = File.join(@user_folder_path, media_file.file) %>
       <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
         <div class="card h-100 shadow-sm">
           <div class="card-body text-center">

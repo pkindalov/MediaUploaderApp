@@ -12,21 +12,29 @@ class MediaFilesController < ApplicationController
   before_action :authenticate_user!, except: %i[index watch]
 
   def index
-    media_files = @folder.media_files.order('created_at DESC')
+    # Fetch all media files in the current folder and its subfolders
+    media_files = fetch_all_media_files(@folder)
+
+    # Sort the files based on availability
     sorted_files = sort_files_by_availability(media_files)
 
-    # Уверяваме се, че sorted_files е масив, дори и да няма файлове
+    Rails.logger.debug "Total media files found: #{sorted_files.size}"
+
+    # Ensure sorted_files is an array, even if empty
     sorted_files ||= []
 
-    # Приложи филтъра по тип на файловете
+    # Apply the filter by file type
     filtered_files = filter_media_files(sorted_files, params[:filter])
 
+    # Set up pagination
     @media_files = WillPaginate::Collection.create(params[:page] || 1, 40, filtered_files.size) do |pager|
-      # Ако sorted_files е празен, pager.offset и pager.per_page ще бъдат безопасни
       pager.replace(filtered_files[pager.offset, pager.per_page].to_a)
     end
 
+    # Extract EXIF data for image files
     @exif_data = extract_exif_data
+
+    # Calculate the size of the current folder and its subfolders
     @folder_size = calculate_single_folder_size(@folder)
   end
 
@@ -225,4 +233,18 @@ class MediaFilesController < ApplicationController
     end
     exif_data
   end
+
+  def fetch_all_media_files(folder)
+    media_files = folder.media_files
+
+    Rails.logger.debug "Fetching files for folder: #{folder.name}, Found: #{media_files.map(&:file).join(', ')}"
+
+    # Recursively get media files from all subfolders
+    folder.subfolders.each do |subfolder|
+      media_files += fetch_all_media_files(subfolder)
+    end
+
+    media_files
+  end
+
 end

@@ -10,12 +10,17 @@
         <div id="userImagesCarousel" class="carousel slide" data-bs-ride="carousel">
           <div class="carousel-inner">
             <% if media_files.present? %>
-              <% media_files.each_with_index do |media_file, index| %>
-                <% file_path = "#{Rails.configuration.user_files_path}/#{media_file.folder.user.email}/#{media_file.folder.name}/#{media_file.file}" %>
-                <% if File.exist?(file_path) %>
-                  <div class="carousel-item <%= 'active' if index.zero? %>">
-                    <%= image_tag(serve_media_file_path(file_path: file_path), alt: media_file.file, class: 'd-block w-100') %>
-                  </div>
+              <% active_set = false %> <!-- Variable to track if 'active' class has been set -->
+              <% media_files.each do |media_file| %>
+                <% file_extension = File.extname(media_file.file).downcase %>
+                <% if %w[.jpg .jpeg .png .gif].include?(file_extension) %>
+                  <% file_path = File.join(Rails.configuration.user_files_path, media_file.folder.user.email, media_file.folder.full_path, media_file.file) %>
+                  <% if File.exist?(file_path) %>
+                    <div class="carousel-item <%= 'active' unless active_set %>">
+                      <%= image_tag(serve_media_file_path(file_path: file_path), alt: media_file.file, class: 'd-block w-100') %>
+                    </div>
+                    <% active_set = true %> <!-- Set the 'active' class only for the first image -->
+                  <% end %>
                 <% end %>
               <% end %>
             <% else %>
