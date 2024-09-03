@@ -1,7 +1,7 @@
 <div>
   <h3 class="mb-4 text-center"><i class="fa-solid fa-file"></i> Всички файлове</h3>
 
-  <div class="d-flex flex-column flex-md-row  align-items-center gap-1 mb-4">
+  <div class="d-flex flex-column flex-md-row align-items-center gap-1 mb-4">
     <%= render 'shared/media_filter' %>
     <!-- Бутон за галерията -->
     <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#galleryModal">
@@ -12,7 +12,7 @@
   <ul class="list-group mt-4">
     <% if @files.any? %>
       <% @files.each do |media_file| %>
-        <% file_path = "#{Rails.configuration.user_files_path}/#{media_file.folder.user.email}/#{media_file.folder.name}/#{media_file.file}" %>
+        <% file_path = File.join(Rails.configuration.user_files_path, media_file.folder.user.email, media_file.folder.full_path, media_file.file) %>
         <li class="list-group-item">
           <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
             <div class="d-flex align-items-center">

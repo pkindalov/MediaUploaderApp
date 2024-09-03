@@ -62,7 +62,7 @@
                 <% @recent_files.each do |media_file| %>
                   <li class="list-group-item d-flex justify-content-between align-items-center">
                     <div>
-                      <% file_path = "#{Rails.configuration.user_files_path}/#{media_file.folder.user.email}/#{media_file.folder.name}/#{media_file.file}" %>
+                      <% file_path = File.join(Rails.configuration.user_files_path, media_file.folder.user.email, media_file.folder.full_path, media_file.file) %>
                       <% if File.exist?(file_path) %>
                         <a href="<%= serve_media_file_path(file_path: file_path) %>" target="_blank" class="text-decoration-none">
                           <%= media_file.file %>
