@@ -9,7 +9,7 @@ class HomeController < ApplicationController
       @recent_files = sort_files_by_availability(MediaFile.order(created_at: :desc).limit(5))
       disk_mount_point = ENV.fetch('DISK_MOUNT_POINT', 'E:/')
       @disk_usage = calculate_disk_usage(disk_mount_point)
-      @folder_sizes = calculate_folder_sizes(@recent_folders)
+      @folder_sizes = calculate_total_folder_sizes(@recent_folders)
     end
   end
 
@@ -42,5 +42,33 @@ class HomeController < ApplicationController
     e = (Math.log(bytes) / Math.log(1024)).floor
     s = "%.2f" % (bytes.to_f / 1024 ** e)
     "#{s} #{units[e]}"
+  end
+
+  # Calculate total sizes including subfolders
+  def calculate_total_folder_sizes(folders)
+    folder_sizes = {}
+
+    folders.each do |folder|
+      folder_sizes[folder.id] = calculate_total_folder_size(folder)
+    end
+
+    folder_sizes
+  end
+
+  def calculate_total_folder_size(folder)
+    total_size = 0
+
+    # Calculate size of files in the current folder
+    folder.media_files.each do |media_file|
+      file_path = File.join(Rails.configuration.user_files_path, folder.user.email, folder.full_path, media_file.file)
+      total_size += File.size(file_path) if File.exist?(file_path)
+    end
+
+    # Recursively add sizes of subfolders
+    folder.subfolders.each do |subfolder|
+      total_size += calculate_total_folder_size(subfolder)
+    end
+
+    total_size
   end
 end
