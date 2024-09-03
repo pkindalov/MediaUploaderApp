@@ -37,7 +37,10 @@
                         <small class="text-success">Размер: <%= number_to_human_size(@folder_sizes[folder.id]) %></small>
                       <% end %>
                     </div>
-                    <span class="badge bg-primary rounded-pill"><%= folder.media_files.count %> файла</span>
+                    <div>
+                      <span class="badge bg-primary rounded-pill"><%= folder.media_files.count %> файла</span>
+                      <span class="badge bg-secondary rounded-pill"><%= folder.subfolders.count %> под-папки</span>
+                    </div>
                   </li>
                 <% end %>
               <% else %>
