@@ -5,9 +5,18 @@
   <ul class="list-group mt-5">
     <% if @folders.any? %>
       <% @folders.each do |folder| %>
-        <li class="list-group-item d-flex justify-content-between align-items-center">
+        <% is_child = folder.parent.present? %> <!-- Check if folder has a parent -->
+        <li class="list-group-item d-flex justify-content-between align-items-center" style="<%= is_child ? 'padding-left: 40px;' : '' %>">
           <div>
-            <%= link_to folder.name, folder_media_files_path(folder), class: 'text-decoration-none' %>
+            <!-- Add folder icon based on whether it's a parent or child -->
+            <% if is_child %>
+              <i class="fa-solid fa-folder-child text-muted"></i> <!-- Icon for child folder -->
+            <% else %>
+              <i class="fa-solid fa-folder text-primary"></i> <!-- Icon for parent folder -->
+            <% end %>
+
+            <!-- Folder name link with parent/child distinction -->
+            <strong><%= link_to folder.name, folder_media_files_path(folder), class: 'text-decoration-none' %></strong>
             <small class="text-muted d-block">
               - качена на <%= folder.created_at.strftime("%d/%m/%Y") %> от
               <%= link_to user_profile_path(folder.user), class: 'text-decoration-none' do %>

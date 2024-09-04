@@ -11,11 +11,36 @@ class FoldersController < ApplicationController
   end
 
   def list_all_folders
-    @folders = Folder.order(created_at: :desc).paginate(page: params[:page], per_page: 50)
+    # Fetch all parent folders
+    parent_folders = Folder.where(parent_id: nil).order(created_at: :desc)
+
+    # Recursively fetch all folders with their children and store in a flat array
+    all_folders = []
+    parent_folders.each do |parent_folder|
+      add_folder_with_children(parent_folder, all_folders)
+    end
+
+    total_folders_count = all_folders.size
+    page = (params[:page] || 1).to_i
+    per_page = 50
+    max_page = (total_folders_count.to_f / per_page).ceil
+
+    # Redirect to the last page if the requested page exceeds the max page
+    if page > max_page && max_page > 0
+      redirect_to list_folders_path(page: max_page), alert: 'Няма повече записи' and return
+    elsif total_folders_count == 0
+      set_flash_message!(:notice, 'Няма налични папки.')
+    end
+
+    # Paginate the folders
+    @folders = WillPaginate::Collection.create(page, per_page, total_folders_count) do |pager|
+      start = (pager.current_page - 1) * pager.per_page
+      pager.replace(all_folders[start, pager.per_page])
+    end
+
     @folder_sizes = calculate_total_folder_sizes(@folders)
     @total_size = number_to_human_size(@folder_sizes.values.sum)
   end
-
 
   def new
     @folder = current_user.folders.new
@@ -145,5 +170,12 @@ class FoldersController < ApplicationController
     folder_path = File.join(user_folder_path, build_path_for_parent(folder.parent), folder.name)
 
     FileUtils.rm_rf(folder_path) if Dir.exist?(folder_path)
+  end
+
+  def add_folder_with_children(folder, folder_list)
+    folder_list << folder
+    folder.subfolders.order(:created_at).each do |subfolder|
+      add_folder_with_children(subfolder, folder_list)
+    end
   end
 end
