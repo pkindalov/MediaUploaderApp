@@ -5,18 +5,23 @@
   <ul class="list-group mt-5">
     <% if @folders.any? %>
       <% @folders.each do |folder| %>
-        <li class="list-group-item">
-          <%= link_to folder.name, folder_media_files_path(folder), class: 'text-decoration-none' %>
-          <small class="text-muted">
-            - качена на <%= folder.created_at.strftime("%d/%m/%Y") %> от
-            <%= link_to user_profile_path(folder.user), class: 'text-decoration-none' do %>
-              <%= folder.user.email %>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <%= link_to folder.name, folder_media_files_path(folder), class: 'text-decoration-none' %>
+            <small class="text-muted d-block">
+              - качена на <%= folder.created_at.strftime("%d/%m/%Y") %> от
+              <%= link_to user_profile_path(folder.user), class: 'text-decoration-none' do %>
+                <%= folder.user.email %>
+              <% end %>
+            </small>
+            <% if @folder_sizes[folder.id] %>
+              <small class="text-success"> - Размер: <%= number_to_human_size(@folder_sizes[folder.id]) %></small>
             <% end %>
-          </small>
-          <small class="text-primary">(<%= folder.media_files.count %> файла)</small>
-          <% if @folder_sizes[folder.id] %>
-            <small class="text-success"> - Размер: <%= number_to_human_size(@folder_sizes[folder.id]) %></small>
-          <% end %>
+          </div>
+          <div>
+            <span class="badge bg-primary rounded-pill"><%= folder.media_files.count %> файла</span>
+            <span class="badge bg-secondary rounded-pill"><%= folder.subfolders.count %> под-папки</span>
+          </div>
         </li>
       <% end %>
     <% else %>
