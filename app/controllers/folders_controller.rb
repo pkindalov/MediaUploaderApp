@@ -7,7 +7,25 @@ class FoldersController < ApplicationController
 
   def index
     create_physical_folder_for_user
-    @folders = current_user.folders.order('created_at DESC').paginate(page: params[:page], per_page: 40)
+
+    # Fetch all parent folders for the current user
+    parent_folders = current_user.folders.where(parent_id: nil).order('created_at DESC')
+
+    # Recursively fetch all folders with their children and store in a flat array
+    all_folders = []
+    parent_folders.each do |parent_folder|
+      add_folder_with_children(parent_folder, all_folders)
+    end
+
+    # Paginate the folders
+    total_folders_count = all_folders.size
+    page = params[:page] || 1
+    @folders = WillPaginate::Collection.create(page, 40, total_folders_count) do |pager|
+      start = (pager.current_page - 1) * pager.per_page
+      pager.replace(all_folders[start, pager.per_page])
+    end
+
+    @folder_sizes = calculate_total_folder_sizes(@folders)
   end
 
   def list_all_folders
@@ -171,5 +189,4 @@ class FoldersController < ApplicationController
 
     FileUtils.rm_rf(folder_path) if Dir.exist?(folder_path)
   end
-
 end

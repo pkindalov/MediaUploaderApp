@@ -1,12 +1,42 @@
 <h1>Управление на вашите папки</h1>
+
 <%= link_to new_folder_path, class: 'btn btn-primary mt-3 mb-2' do %>
   <i class="fa-solid fa-folder-plus"></i> Нова Папка
 <% end %>
+
 <hr />
 
 <% if @folders.present? && @folders.count > 0 %>
   <ul class="list-group mt-5">
-    <%= render_folders(@folders) %>
+    <% @folders.each do |folder| %>
+      <% is_child = folder.parent.present? %> <!-- Check if folder has a parent -->
+      <li class="list-group-item d-flex justify-content-between align-items-center" style="<%= is_child ? 'padding-left: 40px;' : '' %>">
+        <div>
+          <!-- Add folder icon based on whether it's a parent or child -->
+          <% if is_child %>
+            <i class="fa-solid fa-folder-child text-muted"></i> <!-- Icon for child folder -->
+          <% else %>
+            <i class="fa-solid fa-folder text-primary"></i> <!-- Icon for parent folder -->
+          <% end %>
+
+          <!-- Folder name link with parent/child distinction -->
+          <strong><%= link_to folder.name, folder_media_files_path(folder), class: 'text-decoration-none' %></strong>
+          <small class="text-muted d-block">
+            - качена на <%= folder.created_at.strftime("%d/%m/%Y") %> от
+            <%= link_to user_profile_path(folder.user), class: 'text-decoration-none' do %>
+              <%= folder.user.email %>
+            <% end %>
+          </small>
+          <% if @folder_sizes[folder.id] %>
+            <small class="text-success"> - Размер: <%= number_to_human_size(@folder_sizes[folder.id]) %></small>
+          <% end %>
+        </div>
+        <div>
+          <span class="badge bg-primary rounded-pill"><%= folder.media_files.count %> файла</span>
+          <span class="badge bg-secondary rounded-pill"><%= folder.subfolders.count %> под-папки</span>
+        </div>
+      </li>
+    <% end %>
   </ul>
 
   <div class="text-center">
@@ -15,4 +45,3 @@
 <% else %>
   <p>Все още няма създадени директории</p>
 <% end %>
-
