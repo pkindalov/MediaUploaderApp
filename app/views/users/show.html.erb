@@ -2,7 +2,7 @@
 <div class="container mt-5">
   <div class="row">
     <div class="col-md-3">
-      <!-- Потребителска информация -->
+      <!-- User Information -->
       <div class="card mb-4">
         <div class="card-header">
           <h4>Профил на потребителя</h4>
@@ -18,7 +18,7 @@
     </div>
 
     <div class="col-md-9">
-      <!-- Последни папки -->
+      <!-- Last Uploaded Folders -->
       <div class="card mb-4">
         <div class="card-header">
           <h4>Последно качени папки</h4>
@@ -26,26 +26,29 @@
         <ul class="list-group list-group-flush">
           <% if @folders.any? %>
             <% @folders.each do |folder| %>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
+              <% is_child = folder.parent.present? %> <!-- Check if folder has a parent -->
+              <li class="list-group-item d-flex justify-content-between align-items-center" style="<%= is_child ? 'padding-left: 40px;' : '' %>">
                 <div>
-                  <%= link_to folder.name, folder_media_files_path(folder), class: 'text-decoration-none' %>
-                  <small class="text-muted"> - качена на <%= folder.created_at.strftime("%d/%m/%Y") %></small>
-                  <small class="text-primary d-block"><%= folder.media_files.count %> файла</small>
+                  <!-- Add folder icon based on whether it's a parent or child -->
+                  <% if is_child %>
+                    <i class="fa-solid fa-folder-child text-muted"></i> <!-- Icon for child folder -->
+                  <% else %>
+                    <i class="fa-solid fa-folder text-primary"></i> <!-- Icon for parent folder -->
+                  <% end %>
+
+                  <!-- Folder name link with parent/child distinction -->
+                  <strong><%= link_to folder.name, folder_media_files_path(folder), class: 'text-decoration-none' %></strong>
+                  <small class="text-muted d-block">
+                    - качена на <%= folder.created_at.strftime("%d/%m/%Y") %>
+                  </small>
                   <% if @folder_sizes && @folder_sizes[folder.id] %>
-                    <small class="text-success d-block"> -
-                      Размер: <%= number_to_human_size(@folder_sizes[folder.id]) %></small>
+                    <small class="text-success"> - Размер: <%= number_to_human_size(@folder_sizes[folder.id]) %></small>
                   <% end %>
                 </div>
-                <% if current_user == folder.user %>
-                  <div class="btn-group">
-                    <%= link_to edit_folder_path(folder), class: 'btn btn-sm btn-warning' do %>
-                      <i class="fas fa-edit"></i> 'Редактирай'
-                    <% end %>
-                    <%= link_to folder_path(folder), method: :delete, data: { confirm: 'Сигурни ли сте, че искате да изтриете тази папка?' }, class: 'btn btn-sm btn-danger' do %>
-                      <i class="fas fa-trash-alt"></i> Изтрий
-                    <% end %>
-                  </div>
-                <% end %>
+                <div>
+                  <span class="badge bg-primary rounded-pill"><%= folder.media_files.count %> файла</span>
+                  <span class="badge bg-secondary rounded-pill"><%= folder.subfolders.count %> под-папки</span>
+                </div>
               </li>
             <% end %>
           <% else %>
@@ -57,7 +60,7 @@
         </div>
       </div>
 
-      <!-- Последни файлове -->
+      <!-- Last Uploaded Files -->
       <div class="card">
         <div class="card-header d-flex gap-3 align-items-center">
           <h4>Последно качени файлове</h4>
@@ -115,13 +118,13 @@
                 </div>
               </li>
 
-              <!-- Модален прозорец за изображенията -->
+              <!-- Modal for image preview -->
               <div class="modal fade" id="imageModal-<%= media_file.id %>" tabindex="-1" aria-labelledby="imageModalLabel-<%= media_file.id %>" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered">
                   <div class="modal-content">
                     <div class="modal-header">
                       <h5 class="modal-title" id="imageModalLabel-<%= media_file.id %>"><%= media_file.file %></h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Затвори"></button>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body text-center">
                       <%= image_tag(serve_media_file_path(file_path: file_path), alt: media_file.file, class: 'img-fluid') %>
