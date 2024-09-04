@@ -172,10 +172,4 @@ class FoldersController < ApplicationController
     FileUtils.rm_rf(folder_path) if Dir.exist?(folder_path)
   end
 
-  def add_folder_with_children(folder, folder_list)
-    folder_list << folder
-    folder.subfolders.order(:created_at).each do |subfolder|
-      add_folder_with_children(subfolder, folder_list)
-    end
-  end
 end

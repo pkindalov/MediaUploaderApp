@@ -44,4 +44,12 @@ module FolderSizeCalculator
     end
     total_size
   end
+
+  # Recursive function to add folder and its children
+  def add_folder_with_children(folder, folder_list)
+    folder_list << folder
+    folder.subfolders.order(:created_at).each do |subfolder|
+      add_folder_with_children(subfolder, folder_list)
+    end
+  end
 end
