@@ -19,6 +19,10 @@ class FoldersControllerTest < ActionDispatch::IntegrationTest
   #   assert true
   # end
 
+  def teardown
+    FileUtils.rm_rf(@user_main_folder_path) if Dir.exist?(@user_main_folder_path)
+  end
+
   test 'create one folder and one subfolder and then move the subfolder on the level of the folder' do
 
     # Now, create a folder in the database and on the flash drive
@@ -60,10 +64,6 @@ class FoldersControllerTest < ActionDispatch::IntegrationTest
     else
       raise 'Error: Folder could not be created in the database.'
     end
-
-    # removing folders after test
-    # puts @user_main_folder_path
-    FileUtils.rm_rf(@user_main_folder_path)
 
   end
 
