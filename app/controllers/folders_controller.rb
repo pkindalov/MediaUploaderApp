@@ -22,7 +22,7 @@ class FoldersController < ApplicationController
     page = params[:page] || 1
     @folders = WillPaginate::Collection.create(page, 40, total_folders_count) do |pager|
       start = (pager.current_page - 1) * pager.per_page
-      pager.replace(all_folders[start, pager.per_page])
+      pager.replace(all_folders[start, pager.per_page] || [])
     end
 
     @folder_sizes = calculate_total_folder_sizes(@folders)

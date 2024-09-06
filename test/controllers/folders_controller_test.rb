@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'test_helper'
+require 'minitest/mock'
 
 class FoldersControllerTest < ActionDispatch::IntegrationTest
   setup do
@@ -44,6 +45,66 @@ class FoldersControllerTest < ActionDispatch::IntegrationTest
     assert_includes folders, @parent_folder2
     assert_includes folders, @child_folder # Child folder should be in the flat list of folders
   end
+
+  test 'should paginate folders correctly' do
+    # Ensure there are no pre-existing folders
+    Folder.where(user: @user).destroy_all
+
+    # Create exactly 45 folders for the test
+    45.times { |i| Folder.create!(name: "Folder #{i+1}", user: @user) }
+
+    # Fetch the first page (default is page 1)
+    get folders_path
+    assert_response :success
+
+    # Only 40 folders should be shown on the first page
+    assert_equal 40, assigns(:folders).size
+
+    # Fetch the second page
+    get folders_path(page: 2)
+    assert_response :success
+
+    # The remaining 5 folders should be shown on the second page
+    assert_equal 5, assigns(:folders).size
+
+    # Fetch the third page (should be empty)
+    get folders_path(page: 3)
+    assert_response :success
+
+    # No folders should be shown on the third page
+    assert_equal 0, assigns(:folders).size
+  end
+
+
+  test 'should create a subfolder inside a parent folder' do
+    # Create a parent folder
+    parent_folder = Folder.create!(name: 'Parent Folder', user: @user)
+
+    # Simulate a POST request to create a subfolder
+    post folders_path, params: {
+      folder: { name: 'Subfolder', parent_id: parent_folder.id }
+    }
+
+    # Check if the response is a redirect (folder successfully created)
+    assert_response :redirect
+    follow_redirect!
+
+    # Ensure the subfolder was created and assigned to the parent
+    subfolder = Folder.find_by(name: 'Subfolder')
+    assert_not_nil subfolder
+    assert_equal parent_folder.id, subfolder.parent_id
+  end
+
+
+
+
+
+
+
+
+
+
+
 
 
 
