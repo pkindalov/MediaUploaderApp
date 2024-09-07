@@ -76,24 +76,43 @@ class FoldersControllerTest < ActionDispatch::IntegrationTest
   end
 
 
-  test 'should create a subfolder inside a parent folder' do
-    # Create a parent folder
+  # Test 1: Database-only verification
+  test "should create a subfolder inside a parent folder" do
     parent_folder = Folder.create!(name: 'Parent Folder', user: @user)
 
-    # Simulate a POST request to create a subfolder
     post folders_path, params: {
       folder: { name: 'Subfolder', parent_id: parent_folder.id }
     }
 
-    # Check if the response is a redirect (folder successfully created)
     assert_response :redirect
     follow_redirect!
 
-    # Ensure the subfolder was created and assigned to the parent
     subfolder = Folder.find_by(name: 'Subfolder')
     assert_not_nil subfolder
     assert_equal parent_folder.id, subfolder.parent_id
   end
+
+  # Test 2: Database + Physical Folder Verification
+  test "should create a subfolder inside a parent folder and check physical folder creation" do
+    parent_folder = Folder.create!(name: 'Parent Folder', user: @user)
+
+    post folders_path, params: {
+      folder: { name: 'Subfolder', parent_id: parent_folder.id }
+    }
+
+    assert_response :redirect
+    follow_redirect!
+
+    subfolder = Folder.find_by(name: 'Subfolder')
+    assert_not_nil subfolder
+    assert_equal parent_folder.id, subfolder.parent_id
+
+    # Verify the physical folder was created on the flash drive
+    user_files_path = Rails.configuration.user_files_path
+    expected_folder_path = File.join(user_files_path, @user.email, parent_folder.name, subfolder.name)
+    assert Dir.exist?(expected_folder_path), "Expected folder #{expected_folder_path} to exist on the flash drive."
+  end
+
 
 
 
