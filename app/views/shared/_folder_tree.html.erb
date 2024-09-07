@@ -1,0 +1,38 @@
+<li class="list-group-item d-flex justify-content-between align-items-center" style="padding-left: <%= level * 20 %>px;">
+  <div>
+    <!-- Folder Icon -->
+    <% if folder.parent.present? %>
+      <i class="fa-solid fa-folder-child text-muted"></i> <!-- Child Folder -->
+    <% else %>
+      <i class="fa-solid fa-folder text-primary"></i> <!-- Parent Folder -->
+    <% end %>
+
+    <!-- Folder Name -->
+    <strong><%= link_to folder.name, folder_media_files_path(folder), class: 'text-decoration-none' %></strong>
+    <small class="text-muted d-block">
+      - качена на <%= folder.created_at.strftime("%d/%m/%Y") %> от <%= folder.user.email %>
+    </small>
+    <% if @folder_sizes[folder.id] %>
+      <small class="text-success"> - Размер: <%= number_to_human_size(@folder_sizes[folder.id]) %></small>
+    <% end %>
+  </div>
+
+  <!-- Actions (Edit and Delete) -->
+  <div>
+    <span class="badge bg-primary rounded-pill"><%= folder.media_files.count %> файла</span>
+    <span class="badge bg-secondary rounded-pill"><%= folder.subfolders.count %> под-папки</span>
+
+    <%= link_to edit_folder_path(folder), class: 'btn btn-sm btn-warning ms-2' do %>
+      <i class="fa fa-edit"></i> Редактиране
+    <% end %>
+
+    <%= link_to folder_path(folder), method: :delete, data: { confirm: "Сигурни ли сте, че искате да изтриете тази папка?" }, class: 'btn btn-sm btn-danger ms-2' do %>
+      <i class="fa fa-trash"></i> Изтриване
+    <% end %>
+  </div>
+</li>
+
+<!-- Recursively Render Only Direct Subfolders -->
+<% folder.subfolders.each do |subfolder| %>
+  <%= render partial: 'shared/folder_tree', locals: { folder: subfolder, level: level + 1 } %>
+<% end %>
