@@ -90,7 +90,7 @@ class FoldersController < ApplicationController
 
   def destroy
     if @folder.nil?
-      redirect_to folders_path, alert: "Folder not found."
+      redirect_to folders_path, alert: 'Folder not found.'
       return
     end
 
@@ -100,7 +100,7 @@ class FoldersController < ApplicationController
       delete_descendants(@folder)
     rescue => e
       Rails.logger.error "Failed to delete descendant folders: #{e.message}"
-      redirect_to folders_path, alert: "Failed to delete descendant folders."
+      redirect_to folders_path, alert: 'Failed to delete descendant folders.'
       return
     end
 
@@ -108,7 +108,7 @@ class FoldersController < ApplicationController
       delete_physical_folder(@folder)
     rescue => e
       Rails.logger.error "Failed to delete physical folder: #{e.message}"
-      redirect_to folders_path, alert: "Failed to delete the physical folder."
+      redirect_to folders_path, alert: 'Failed to delete the physical folder.'
       return
     end
 
@@ -117,7 +117,7 @@ class FoldersController < ApplicationController
       redirect_to folders_path, notice: 'Folder deleted successfully.'
     else
       Rails.logger.error "Failed to delete folder from database: #{@folder.errors.full_messages.join(', ')}"
-      redirect_to folders_path, alert: "Failed to delete the folder from the database."
+      redirect_to folders_path, alert: 'Failed to delete the folder from the database.'
     end
   end
 
@@ -126,7 +126,7 @@ class FoldersController < ApplicationController
   def set_folder
     @folder = current_user.folders.find_by(id: params[:id])
     if @folder.nil?
-      redirect_to folders_path, alert: "Folder not found."
+      redirect_to folders_path, alert: 'Folder not found.'
     end
   end
 
@@ -151,20 +151,34 @@ class FoldersController < ApplicationController
     root_path = Rails.configuration.user_files_path
     user_folder_path = File.join(root_path, current_user.email)
 
-    old_folder_path = File.join(user_folder_path, build_path_for_parent(folder_was_parent(folder)), folder.name_was)
-    new_folder_path = File.join(user_folder_path, build_path_for_parent(Folder.find_by(id: folder_params[:parent_id])), folder_params[:name])
+    old_folder_path = File.join(user_folder_path, build_path_for_parent(folder_was_parent(folder)), folder.name_was.presence || 'Default Folder')
+    new_folder_name = folder_params[:name].presence || folder.name.presence || 'Default Folder'
+    new_folder_path = File.join(user_folder_path, build_path_for_parent(Folder.find_by(id: folder_params[:parent_id])), new_folder_name)
+
+    # Log the folder paths for debugging
+    Rails.logger.info "Old Folder Path: #{old_folder_path}"
+    Rails.logger.info "New Folder Path: #{new_folder_path}"
 
     return if old_folder_path == new_folder_path
 
     FileUtils.mkdir_p(File.dirname(new_folder_path)) unless Dir.exist?(File.dirname(new_folder_path))
 
     begin
-      FileUtils.mv(old_folder_path, new_folder_path) if Dir.exist?(old_folder_path)
+      if Dir.exist?(old_folder_path)
+        FileUtils.mv(old_folder_path, new_folder_path)
+        Rails.logger.info "Folder moved from #{old_folder_path} to #{new_folder_path}"
+      else
+        Rails.logger.error "Old folder path does not exist: #{old_folder_path}"
+      end
     rescue => e
       Rails.logger.error "Error moving folder: #{e.message}"
       raise
     end
   end
+
+
+
+
 
   def folder_was_parent(folder)
     Folder.find_by(id: folder.parent_id_was)

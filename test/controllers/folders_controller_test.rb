@@ -114,6 +114,43 @@ class FoldersControllerTest < ActionDispatch::IntegrationTest
   end
 
 
+  test "should move a subfolder from one parent folder to another" do
+    # Simulate POST requests to create the parent folders
+    post folders_path, params: { folder: { name: 'Parent Folder 1' } }
+    parent_folder1 = Folder.find_by(name: 'Parent Folder 1')
+
+    post folders_path, params: { folder: { name: 'Parent Folder 2' } }
+    parent_folder2 = Folder.find_by(name: 'Parent Folder 2')
+
+    # Simulate POST request to create a subfolder under the first parent
+    post folders_path, params: { folder: { name: 'Subfolder', parent_id: parent_folder1.id } }
+    subfolder = Folder.find_by(name: 'Subfolder')
+
+    # Simulate a PATCH request to update the subfolder's parent_id to the second parent
+    patch folder_path(subfolder), params: {
+      folder: { parent_id: parent_folder2.id }
+    }
+
+    # Check if the response is a redirect (folder successfully updated)
+    assert_response :redirect
+    follow_redirect!
+
+    # Reload the subfolder to check if its parent was updated correctly in the database
+    subfolder.reload
+    assert_equal parent_folder2.id, subfolder.parent_id, "Subfolder should now be under Parent Folder 2"
+
+    # Verify the physical folder was moved on the flash drive
+    user_files_path = Rails.configuration.user_files_path
+    old_folder_path = File.join(user_files_path, @user.email, parent_folder1.name, subfolder.name)
+    new_folder_path = File.join(user_files_path, @user.email, parent_folder2.name, subfolder.name)
+
+    # The old folder should not exist, and the new folder should exist
+    assert_not Dir.exist?(old_folder_path), "Old folder path #{old_folder_path} should no longer exist."
+    assert Dir.exist?(new_folder_path), "New folder path #{new_folder_path} should exist."
+  end
+
+
+
 
 
 
@@ -131,9 +168,9 @@ class FoldersControllerTest < ActionDispatch::IntegrationTest
   #   assert true
   # end
 
-  # def teardown
-  #   FileUtils.rm_rf(@user_main_folder_path) if Dir.exist?(@user_main_folder_path)
-  # end
+  def teardown
+    FileUtils.rm_rf(@user_main_folder_path) if Dir.exist?(@user_main_folder_path)
+  end
 
   # def create_folder_structure(base_folder, subfolders)
   #   subfolders.each do |subfolder|
